@@ -1,0 +1,248 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ImageMapHTML" xml:space="preserve">
+    <value>&lt;!doctype html&gt;&lt;html lang="en"&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&lt;div id="imgBank"&gt;
+&lt;img id="btnMoreExamples-default" src="images/btnMoreExamples-default.png"&gt;
+&lt;img id="btnMoreExamples-hover" src="images/btnMoreExamples-hover.png"&gt;
+&lt;img id="btnMoreExamples-press" src="images/btnMoreExamples-press.png"&gt;
+&lt;img id="btnPlayAgain-default" src="images/btnPlayAgain-default.png"&gt;
+&lt;img id="btnPlayAgain-hover" src="images/btnPlayAgain-hover.png"&gt;
+&lt;img id="btnPlayAgain-press" src="images/btnPlayAgain-press.png"&gt;
+&lt;img id="btnShowStars-default" src="images/btnShowStars-default.png"&gt;
+&lt;img id="btnShowStars-hover" src="images/btnShowStars-hover.png"&gt;
+&lt;img id="btnShowStars-press" src="images/btnShowStars-press.png"&gt;
+&lt;img id="cardBack" src="images/cardBack.png"&gt;
+&lt;img id="cardBackStar" src="images/cardBackStar.png"&gt;
+&lt;img id="cardBackTable" src="images/cardBackTable.png"&gt;
+&lt;img id="cardC01" src="images/cardC01.png"&gt;
+&lt;img id="cardC02" src="images/cardC02.png"&gt;
+&lt;img id="cardC03" src="images/cardC03.png"&gt;
+&lt;img id="cardC04" src="images/cardC04.png"&gt;
+&lt;img id="cardC05" src="images/cardC05.png"&gt;
+&lt;img id="cardC06" src="images/cardC06.png"&gt;
+&lt;img id="cardC07" src="images/cardC07.png"&gt;
+&lt;img id="cardC08" src="images/cardC08.png"&gt;
+&lt;img id="cardC09" src="images/cardC09.png"&gt;
+&lt;img id="cardC10" src="images/cardC10.png"&gt;
+&lt;img id="cardCF1" src="images/cardCF1.png"&gt;
+&lt;img id="cardCF2" src="images/cardCF2.png"&gt;
+&lt;img id="cardCF3" src="images/cardCF3.png"&gt;
+&lt;img id="cardD01" src="images/cardD01.png"&gt;
+&lt;img id="cardD02" src="images/cardD02.png"&gt;
+&lt;img id="cardD03" src="images/cardD03.png"&gt;
+&lt;img id="cardD04" src="images/cardD04.png"&gt;
+&lt;img id="cardD05" src="images/cardD05.png"&gt;
+&lt;img id="cardD06" src="images/cardD06.png"&gt;
+&lt;img id="cardD07" src="images/cardD07.png"&gt;
+&lt;img id="cardD08" src="images/cardD08.png"&gt;
+&lt;img id="cardD09" src="images/cardD09.png"&gt;
+&lt;img id="cardD10" src="images/cardD10.png"&gt;
+&lt;img id="cardDF1" src="images/cardDF1.png"&gt;
+&lt;img id="cardDF2" src="images/cardDF2.png"&gt;
+&lt;img id="cardDF3" src="images/cardDF3.png"&gt;
+&lt;img id="cardH01" src="images/cardH01.png"&gt;
+&lt;img id="cardH02" src="images/cardH02.png"&gt;
+&lt;img id="cardH03" src="images/cardH03.png"&gt;
+&lt;img id="cardH04" src="images/cardH04.png"&gt;
+&lt;img id="cardH05" src="images/cardH05.png"&gt;
+&lt;img id="cardH06" src="images/cardH06.png"&gt;
+&lt;img id="cardH07" src="images/cardH07.png"&gt;
+&lt;img id="cardH08" src="images/cardH08.png"&gt;
+&lt;img id="cardH09" src="images/cardH09.png"&gt;
+&lt;img id="cardH10" src="images/cardH10.png"&gt;
+&lt;img id="cardHF1" src="images/cardHF1.png"&gt;
+&lt;img id="cardHF2" src="images/cardHF2.png"&gt;
+&lt;img id="cardHF3" src="images/cardHF3.png"&gt;
+&lt;img id="cardS01" src="images/cardS01.png"&gt;
+&lt;img id="cardS02" src="images/cardS02.png"&gt;
+&lt;img id="cardS03" src="images/cardS03.png"&gt;
+&lt;img id="cardS04" src="images/cardS04.png"&gt;
+&lt;img id="cardS05" src="images/cardS05.png"&gt;
+&lt;img id="cardS06" src="images/cardS06.png"&gt;
+&lt;img id="cardS07" src="images/cardS07.png"&gt;
+&lt;img id="cardS08" src="images/cardS08.png"&gt;
+&lt;img id="cardS09" src="images/cardS09.png"&gt;
+&lt;img id="cardS10" src="images/cardS10.png"&gt;
+&lt;img id="cardSF1" src="images/cardSF1.png"&gt;
+&lt;img id="cardSF2" src="images/cardSF2.png"&gt;
+&lt;img id="cardSF3" src="images/cardSF3.png"&gt;
+&lt;img id="info01" src="images/info01.png"&gt;
+&lt;img id="info02" src="images/info02.png"&gt;
+&lt;img id="info03" src="images/info03.png"&gt;
+&lt;img id="info04" src="images/info04.png"&gt;
+&lt;img id="info05" src="images/info05.png"&gt;
+&lt;img id="info06" src="images/info06.png"&gt;
+&lt;img id="info07" src="images/info07.png"&gt;
+&lt;img id="ModelControl" src="images/ModelControl.png"&gt;
+&lt;img id="PredictionBarGreen" src="images/PredictionBarGreen.png"&gt;
+&lt;img id="PredictionBarRed" src="images/PredictionBarRed.png"&gt;
+&lt;img id="PredictionBarYellow" src="images/PredictionBarYellow.png"&gt;
+&lt;img id="PredictionControl" src="images/PredictionControl.png"&gt;
+&lt;img id="star" src="images/star.png"&gt;
+&lt;img id="starsemi" src="images/starsemi.png"&gt;
+&lt;img id="SuitC" src="images/SuitC.png"&gt;
+&lt;img id="SuitD" src="images/SuitD.png"&gt;
+&lt;img id="SuitH" src="images/SuitH.png"&gt;
+&lt;img id="SuitS" src="images/SuitS.png"&gt;
+&lt;img id="Value01" src="images/Value01.png"&gt;
+&lt;img id="Value02" src="images/Value02.png"&gt;
+&lt;img id="Value03" src="images/Value03.png"&gt;
+&lt;img id="Value04" src="images/Value04.png"&gt;
+&lt;img id="Value05" src="images/Value05.png"&gt;
+&lt;img id="Value06" src="images/Value06.png"&gt;
+&lt;img id="Value07" src="images/Value07.png"&gt;
+&lt;img id="Value08" src="images/Value08.png"&gt;
+&lt;img id="Value09" src="images/Value09.png"&gt;
+&lt;img id="Value10" src="images/Value10.png"&gt;
+&lt;img id="ValueF1" src="images/ValueF1.png"&gt;
+&lt;img id="ValueF2" src="images/ValueF2.png"&gt;
+&lt;img id="ValueF3" src="images/ValueF3.png"&gt;
+&lt;img id="GameBoard" src="images/GameBoard.jpg"&gt;&lt;/div&gt;&lt;script type="text/javascript"&gt;
+$(document).ready(function ()
+{
+var canvas = document.getElementById("cnvMain");
+if (canvas)
+{
+canvas.width = document.body.clientWidth;
+canvas.height = document.body.clientHeight;
+}
+// Clear the game board.
+clearScreen();
+// Initialize deck.
+initializeDeck();
+});
+$("body").resize(function ()
+{
+var canvas = document.getElementById("cnvMain");
+if (canvas)
+{
+canvas.width = document.body.clientWidth;
+canvas.height = document.body.clientHeight;
+}
+});
+
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;</value>
+    <comment>Image map sample file.</comment>
+  </data>
+  <data name="Syntax" xml:space="preserve">
+    <value>Syntax: HtmlTests.exe</value>
+    <comment>Command-line syntax.</comment>
+  </data>
+</root>
