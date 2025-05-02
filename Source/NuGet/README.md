@@ -39,5 +39,3 @@ namespace MyProject
 For more information, please see the GitHub project:
 [danielanywhere/Html](https://github.com/danielanywhere/Html)
 
-Full API documentation is available at this library's [GitHub User Page](https://danielanywhere.github.io/Geometry).
-
