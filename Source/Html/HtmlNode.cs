@@ -1099,6 +1099,10 @@ namespace Html
 		/// <param name="html">
 		/// Html to insert.
 		/// </param>
+		/// <param name="parse">
+		/// Value indicating whether to parse the text (true), or to just insert
+		/// it as-is (false).
+		/// </param>
 		/// <returns>
 		/// Newly created and added Node.
 		/// </returns>

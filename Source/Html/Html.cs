@@ -50,6 +50,9 @@ namespace Html
 		/// <param name="value">
 		/// Text Value to be whitespace formatted.
 		/// </param>
+		/// <param name="comments">
+		/// Value indicating whether to process the text as comments.
+		/// </param>
 		/// <returns>
 		/// Single line of text, having well-formatted whitespace characteristics.
 		/// </returns>
