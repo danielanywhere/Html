@@ -174,6 +174,7 @@ namespace Html
 		public static void AssignAttributes(string value,
 			HtmlAttributeCollection attributes)
 		{
+			HtmlAttributeItem attribute = null;
 			//Group nameGroup = null;								//	Working Name Group.
 			//IntRangeCollection irc = new IntRangeCollection();
 			//MatchCollection matches;      //	Working Match Collection.
@@ -188,7 +189,17 @@ namespace Html
 				nameValues = HtmlUtil.GetHtmlAttributes(value);
 				foreach(NameValueItem item in nameValues)
 				{
-					attributes.Add(item.Name, item.Value);
+					attribute = new HtmlAttributeItem()
+					{
+						Name = item.Name,
+						Value = item.Value
+					};
+					if(value.ToLower().StartsWith("<!doctype") &&
+						item.Name.ToLower() == "html")
+					{
+						attribute.Presence = true;
+					}
+					attributes.Add(attribute);
 				}
 
 				////	Parse Items with and without values, in or out of quotes.

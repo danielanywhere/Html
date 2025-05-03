@@ -18,6 +18,10 @@
 
 using Html;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace HtmlTests
 {
@@ -32,6 +36,184 @@ namespace HtmlTests
 		//*************************************************************************
 		//*	Private																																*
 		//*************************************************************************
+
+		//*-----------------------------------------------------------------------*
+		//* CreateHtmlDocumentFromContent																					*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Create an HTML document from string content.
+		/// </summary>
+		private static void CreateHtmlDocumentFromContent()
+		{
+			StringBuilder builder = new StringBuilder();
+			Match match = null;
+
+			builder.Append(@"<!DOCTYPE html>
+				<html>
+					<head>
+						<title>Hello World</title>
+					</head>
+					<body>
+						<h1>Welcome!</h1>
+						<p>This document was created using the Data.Html library.</p>
+					</body>
+				</html>");
+
+			//	Notice that in the following document, there will be multiple
+			//	nodes under the html, head, body, and body nodes that have a blank
+			//	NodeType property. This is done to preserve line feeds in the
+			//	original content. To remove all line-feeds from the content
+			//	prior to using the data for processing, you can filter it all
+			//	out using something like:
+			//   doc.Nodes.RemoveAll(x => x.NodeType == "" &&
+			//	  Regex.IsMatch(x.Text, $"[\r\n\t ]{{{x.Text.Length}}}"));
+			//	... which will remove all blank nodes in the document that only
+			//	define whitespace.
+			HtmlDocument doc = HtmlDocument.Parse(builder.ToString(), true);
+
+			//	Remove all inter-node whitespace preservation nodes, which are blank.
+			//	The following code is a more manual alternative to the single line
+			//	in the previous description.
+			List<HtmlNodeItem> matchingNodes =
+				doc.Nodes.FindMatches(x => x.NodeType == "");
+			foreach(HtmlNodeItem matchingNodeItem in matchingNodes)
+			{
+				match = Regex.Match(matchingNodeItem.Text,
+					$"[\r\n\t ]{{{matchingNodeItem.Text.Length}}}");
+				if(match.Success)
+				{
+					matchingNodeItem.Parent.Remove(matchingNodeItem);
+				}
+			}
+
+			//	Trim the text of all of the nodes.
+			List<HtmlNodeItem> flatNodes =
+				doc.Nodes.FindMatches(x => x.Text?.Length >= 0);
+			foreach(HtmlNodeItem nodeItem in flatNodes)
+			{
+				nodeItem.Text = nodeItem.Text.Trim();
+			}
+
+			Console.WriteLine("The document from content is:");
+			Console.WriteLine(doc.Html);
+
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* CreateHtmlDocumentFromImageBank																				*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Create an HTML document from image bank content.
+		/// </summary>
+		private static void CreateHtmlDocumentFromImageBank()
+		{
+			HtmlDocument doc = new HtmlDocument(ResourceMain.ImageMapHTML);
+			Console.WriteLine(doc.ToString());
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* CreateHtmlDocumentProgrammatically																		*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Create an HTML document programmatically from scratch.
+		/// </summary>
+		private static void CreateHtmlDocumentProgrammatically()
+		{
+			HtmlDocument doc = new HtmlDocument();
+			HtmlNodeItem docType = new HtmlNodeItem("!DOCTYPE");
+			HtmlNodeItem html = new HtmlNodeItem("html");
+
+			//	Set the document type to HTML.
+			docType.Attributes.Add(new HtmlAttributeItem()
+			{
+				Name = "html",
+				Presence = true
+			});
+
+			//	Create the head node with a title.
+			HtmlNodeItem head = new HtmlNodeItem("head");
+			HtmlNodeItem title = new HtmlNodeItem("title", "Hello World!");
+			head.Nodes.Add(title);
+			html.Nodes.Add(head);
+
+			//	Create the body with some basic content.
+			HtmlNodeItem body = new HtmlNodeItem("body");
+			body.Nodes.Add("h1", "Welcome!");
+			body.Nodes.Add("p",
+				"This document was created using the Data.Html library.");
+			html.Nodes.Add(body);
+
+			//	Assemble the document.
+			doc.Nodes.Add(docType);
+			doc.Nodes.Add(html);
+
+			Console.WriteLine("The programmatic document is:");
+			Console.WriteLine(doc.Html);
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* CreatePartialHtmlDocumentProgrammatically															*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Create a partial HTML document programmatically from scratch.
+		/// </summary>
+		/// <remarks>
+		/// In this example, a stand-alone, self-renderable snippet is created.
+		/// </remarks>
+		private static void CreatePartialHtmlDocumentProgrammatically()
+		{
+			HtmlNodeItem div = new HtmlNodeItem("div");
+
+			div.Attributes.AddClass("paragraph-list");
+
+			div.Nodes.Add("p", "This is one of the paragraphs.");
+			div.Nodes.Add("p", "This is the second paragraph.");
+			div.Nodes.Add("p", "This is the last paragraph.");
+
+			Console.WriteLine("The snippet is:");
+			Console.WriteLine(div.Html);
+			Console.WriteLine("");
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* RemoveAllLineFeeds																										*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Render the document without line feeds.
+		/// </summary>
+		/// <remarks>
+		/// By default, elements will render with a minimal number of line-feeds
+		/// to help separate content, but it is possible to force all elements
+		/// to render back to back, if you place the node into a document then
+		/// set that document's LineFeed property to false.
+		/// </remarks>
+		private static void RemoveAllLineFeeds()
+		{
+			HtmlDocument doc = new HtmlDocument() { LineFeed = false };
+			HtmlNodeItem ul = new HtmlNodeItem("ul");
+
+
+			ul.Attributes.AddClass("general-list");
+
+			ul.Nodes.Add(
+				"<li><b>First item</b>. This is the first item.</li>", true);
+			ul.Nodes.Add(
+				"<li><b>Second item</b>. A second item.</li>", true);
+			ul.Nodes.Add(
+				"<li><b>Third</b>. This is probably the third item.</li>", true);
+
+			doc.Nodes.Add(ul);
+
+			Console.WriteLine("The list HTML is:");
+			Console.WriteLine(ul.Html);
+			Console.WriteLine("");
+		}
+		//*-----------------------------------------------------------------------*
+
 		//*************************************************************************
 		//*	Protected																															*
 		//*************************************************************************
@@ -52,8 +234,6 @@ namespace HtmlTests
 			string message = "";    //	Message to display in Console.
 			Program prg = new Program();  //	Initialized instance.
 
-			HtmlNodeItem node = new HtmlNodeItem() { NodeType = "p" };
-			node.Attributes.AddClass("fancy");
 
 			Console.WriteLine("HtmlTests.exe");
 			foreach(string arg in args)
@@ -104,9 +284,10 @@ namespace HtmlTests
 		/// </summary>
 		public void Run()
 		{
-			HtmlDocument doc = new HtmlDocument(ResourceMain.ImageMapHTML);
-
-			Console.WriteLine(doc.ToString());
+			CreateHtmlDocumentFromContent();
+			CreateHtmlDocumentProgrammatically();
+			CreatePartialHtmlDocumentProgrammatically();
+			RemoveAllLineFeeds();
 		}
 		//*-----------------------------------------------------------------------*
 

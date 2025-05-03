@@ -83,13 +83,18 @@ namespace Html
 			get
 			{
 				NameItem ro = null;
+				string tl = "";
 
-				foreach(NameItem ni in this)
+				if(name?.Length > 0)
 				{
-					if(ni.Name == name)
+					tl = name.ToLower();
+					foreach(NameItem ni in this)
 					{
-						ro = ni;
-						break;
+						if(ni.Name.ToLower() == tl)
+						{
+							ro = ni;
+							break;
+						}
 					}
 				}
 				return ro;

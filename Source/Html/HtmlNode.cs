@@ -116,7 +116,37 @@ namespace Html
 		}
 		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
 		/// <summary>
-		/// Add a new HtmlNodeItem to the Collection by its content.
+		/// Add a new HtmlNodeItem to the collection by its node type and text.
+		/// </summary>
+		/// <param name="nodeType">
+		/// The node type to add.
+		/// </param>
+		/// <param name="text">
+		/// The node text to add.
+		/// </param>
+		/// <returns>
+		/// Reference to a newly created and added HtmlNodeItem, if a valid
+		/// nodeType was provided. Otherwise, reference to a newly created div
+		/// element.
+		/// </returns>
+		public HtmlNodeItem Add(string nodeType, string text)
+		{
+			HtmlNodeItem node = null;
+
+			if(nodeType?.Length > 0)
+			{
+				node = new HtmlNodeItem(nodeType, text);
+			}
+			if(node == null)
+			{
+				node = new HtmlNodeItem("div");
+			}
+			this.Add(node);
+			return node;
+		}
+		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
+		/// <summary>
+		/// Add a new HtmlNodeItem to the collection by its content.
 		/// </summary>
 		/// <param name="value">
 		/// Element formatted content.
@@ -1500,6 +1530,24 @@ namespace Html
 		{
 			mNodeType = nodeType;
 		}
+		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
+		/// <summary>
+		/// Create a new instance of the HtmlNodeItem item.
+		/// </summary>
+		/// <param name="nodeType">
+		/// The type of node to create.
+		/// </param>
+		/// <param name="text">
+		/// Text to assign to the node.
+		/// </param>
+		public HtmlNodeItem(string nodeType, string text) : this()
+		{
+			mNodeType = nodeType;
+			if(text?.Length > 0)
+			{
+				mText = text;
+			}
+		}
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
@@ -2842,6 +2890,27 @@ namespace Html
 		{
 			get { return mText; }
 			set { mText = value; }
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* ToString																															*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return the string representation of this item.
+		/// </summary>
+		/// <returns>
+		/// The string representation of this item's NodeType, if set. Otherwise,
+		/// '(Blank)'.
+		/// </returns>
+		public override string ToString()
+		{
+			string result = "(Blank)";
+			if(this.mNodeType?.Length > 0)
+			{
+				result = this.mNodeType;
+			}
+			return result;
 		}
 		//*-----------------------------------------------------------------------*
 

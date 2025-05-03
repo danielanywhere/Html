@@ -17,7 +17,7 @@ namespace MyProject
   public static void Main(string[] args)
   {
    HtmlDocument doc = new HtmlDocument();
-   HtmlNodeItem node = new HtmlNodeItem() { NodeType = "p" };
+   HtmlNodeItem node = new HtmlNodeItem("p", "Here is a paragraph.");
 
    node.Attributes.AddClass("fancy");
    doc.Nodes.Add(node);
