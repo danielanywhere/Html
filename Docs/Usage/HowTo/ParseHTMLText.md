@@ -2,7 +2,7 @@
 
 To parse an HTML document, you will generally be using the **HtmlDocument.Parse** method, where there are overloads for various conditions.
 
-The most usual type of case follows in the example.
+A usual type of case follows in the example.
 
 <p>&nbsp;</p>
 

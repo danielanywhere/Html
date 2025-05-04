@@ -54,10 +54,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Update="ResourceMain.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

@@ -14,7 +14,7 @@ Create an in-memory HTML document structure that resembles:
   </head>
   <body>
     <h1>Welcome!</h1>
-    <p>This document was created using the Data.Html library.</p>
+    <p>This document was created using <i>Dans.Html.Library</i>.</p>
   </body>
 </html>
 ```

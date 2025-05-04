@@ -4,13 +4,13 @@ An easy-to-use .NET function library for parsing and directly handling HTML and 
 
 Following are some basic examples.
 
-<p>&nbsp;</p>
+
 
 ## Programmatically Creating an HTML Document from Scratch
 
 This how-to shows you how to build a basic HTML document using the `HtmlDocument` and `HtmlNodeItem` classes. This is useful when you want to programmatically generate HTML content, such as for templating, automation, or internal tools.
 
-<p>&nbsp;</p>
+
 
 ### Goal
 
@@ -24,12 +24,12 @@ Create an in-memory HTML document structure that resembles:
   </head>
   <body>
     <h1>Welcome!</h1>
-    <p>This document was created using the Data.Html library.</p>
+    <p>This document was created using <i>Dans.Html.Library</i>.</p>
   </body>
 </html>
 ```
 
-<p>&nbsp;</p>
+
 
 ### Step-by-Step Example (C#)
 
@@ -83,7 +83,7 @@ public class HtmlBuilderExample
 
 ```
 
-<p>&nbsp;</p>
+
 
 ## Programmatically Create an HTML Snippet
 
@@ -93,7 +93,7 @@ Once created in memory, it can be merged into other trees, serialized, or proces
 
 Any snippet can be rendered to HTML by reading the **Html** property, the same way you would do with a full HtmlDocument.
 
-<p>&nbsp;</p>
+
 
 ### Goal
 
@@ -107,7 +107,7 @@ Create an in-memory HTML node that resembles:
 </div>
 ```
 
-<p>&nbsp;</p>
+
 
 ### Step-by-Step Example (C#)
 
@@ -143,15 +143,15 @@ public class HtmlBuilderExample
 }
 ```
 
-<p>&nbsp;</p>
+
 
 # Parse HTML Text
 
 To parse an HTML document, you will generally be using the **HtmlDocument.Parse** method, where there are overloads for various conditions.
 
-The most usual type of case follows in the example.
+A usual case follows in the example.
 
-<p>&nbsp;</p>
+
 
 ## Step-by-Step Example (C#)
 
@@ -226,7 +226,7 @@ public class HtmlBuilderExample
 }
 ```
 
-<p>&nbsp;</p>
+
 
 ## Updates
 

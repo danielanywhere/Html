@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  * 
  */
+#define NoWindowsOnly
 
 using System;
 using System.Collections.Generic;
@@ -22,8 +23,13 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Text;
 using System.Text.RegularExpressions;
+
+#if WindowsOnly
+//	Make sure to include System.Common.Drawing 6.0 (Windows ONLY!).
+#endif
 
 namespace Html
 {
@@ -3824,10 +3830,12 @@ namespace Html
 			{
 				rs = "0";
 			}
+#if WindowsOnly
 			else if(value == typeof(Image))
 			{
 				rs = nullValue;
 			}
+#endif
 			else if(value == typeof(Int16))
 			{
 				rs = "0";
@@ -3881,10 +3889,12 @@ namespace Html
 			{
 				rs = "ToDouble";
 			}
+#if WindowsOnly
 			else if(value == typeof(Image))
 			{
 				rs = "ToImage";
 			}
+#endif
 			else if(value == typeof(Int16))
 			{
 				rs = "ToInt16";
@@ -3938,10 +3948,12 @@ namespace Html
 			{
 				ro = (double)0;
 			}
+#if WindowsOnly
 			else if(value == typeof(Image))
 			{
 				ro = null;
 			}
+#endif
 			else if(value == typeof(Int16))
 			{
 				ro = (Int16)0;
@@ -5540,6 +5552,7 @@ namespace Html
 		}
 		//*-----------------------------------------------------------------------*
 
+#if WindowsOnly
 		//*-----------------------------------------------------------------------*
 		//*	ToBitmap																															*
 		//*-----------------------------------------------------------------------*
@@ -5604,6 +5617,7 @@ namespace Html
 			return ro;
 		}
 		//*-----------------------------------------------------------------------*
+#endif
 
 		//*-----------------------------------------------------------------------*
 		//* ToBoolean																															*
@@ -5684,6 +5698,7 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 		//*	ToByteArray																														*
 		//*-----------------------------------------------------------------------*
+#if WindowsOnly
 		/// <summary>
 		/// Convert an Image to a byte array, and return the byte array.
 		/// </summary>
@@ -5717,6 +5732,7 @@ namespace Html
 			}
 			return ba;
 		}
+#endif
 		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
 		/// <summary>
 		/// Return a byte array, converted from an object.
@@ -5782,7 +5798,11 @@ namespace Html
 					Copy((Guid)value, ba, 0);
 					break;
 				case SysType.Image:
+#if WindowsOnly
 					ba = ToByteArray((Image)value, ((Image)value).RawFormat);
+#else
+					ba = new byte[0];
+#endif
 					break;
 				case SysType.Int16:
 					ba = new byte[2];
@@ -5918,11 +5938,15 @@ namespace Html
 						}
 						break;
 					case SysType.Image:
+#if WindowsOnly
 						bw = ToByteArray((Image)value, ((Image)value).RawFormat);
 						if(length >= bw.Length)
 						{
 							bw.CopyTo(ba, 0);
 						}
+#else
+						ba = new byte[0];
+#endif
 						break;
 					case SysType.Int16:
 						if(length >= 2)
@@ -7890,7 +7914,9 @@ namespace Html
 							ro = Guid.Empty;
 							break;
 						case SysType.Image:
+#if WindowsOnly
 							ro = new Bitmap(1, 1);
+#endif
 							break;
 						case SysType.Int16:
 							ro = (Int16)0;
@@ -8211,7 +8237,9 @@ namespace Html
 						ro = Guid.Empty;
 						break;
 					case SysType.Image:
+#if WindowsOnly
 						ro = new Bitmap(8, 8);
+#endif
 						break;
 					case SysType.Int16:
 						ro = (Int16)0;
