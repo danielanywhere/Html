@@ -56,8 +56,9 @@ public class HtmlBuilderExample
    // Create the body with some basic content.
    HtmlNodeItem body = new HtmlNodeItem("body");
    body.Nodes.Add("h1", "Welcome!");
-   body.Nodes.Add("p",
-    "This document was created using the Data.Html library.");
+   body.Nodes.Add("<p>" +
+    "This document was created using <i>Dans.Html.Library</i>.</p>",
+    true);
    html.Nodes.Add(body);
 
    // Assemble the document.
@@ -71,3 +72,4 @@ public class HtmlBuilderExample
 }
 
 ```
+

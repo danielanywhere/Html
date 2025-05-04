@@ -161,6 +161,11 @@ In **Visual Studio Code**:
 This library is intended to be used on any target system, avoiding any
 kind of Windows dependencies whatsoever.
 
+You can read how-to articles in the growing library at
+**Docs/Usage/HowTo**. If you don't find what you need right away, either
+check back soon or create an Issue about the subject and I will make
+sure it gets explained.
+
 To see working examples of various uses of this library, see the
 **Source/HtmlTests** folder, where I add various tests and use-cases to
 a stand-alone application before publishing each version.

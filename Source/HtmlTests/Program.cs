@@ -87,9 +87,9 @@ namespace HtmlTests
 			}
 
 			//	Trim the text of all of the nodes.
-			List<HtmlNodeItem> flatNodes =
+			List<HtmlNodeItem> flatNodesList =
 				doc.Nodes.FindMatches(x => x.Text?.Length >= 0);
-			foreach(HtmlNodeItem nodeItem in flatNodes)
+			foreach(HtmlNodeItem nodeItem in flatNodesList)
 			{
 				nodeItem.Text = nodeItem.Text.Trim();
 			}
@@ -141,8 +141,9 @@ namespace HtmlTests
 			//	Create the body with some basic content.
 			HtmlNodeItem body = new HtmlNodeItem("body");
 			body.Nodes.Add("h1", "Welcome!");
-			body.Nodes.Add("p",
-				"This document was created using the Data.Html library.");
+			body.Nodes.Add("<p>" +
+			 "This document was created using <i>Dans.Html.Library</i>.</p>",
+			 true);
 			html.Nodes.Add(body);
 
 			//	Assemble the document.
