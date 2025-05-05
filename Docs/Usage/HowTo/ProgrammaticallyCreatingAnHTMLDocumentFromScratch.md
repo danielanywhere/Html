@@ -1,8 +1,8 @@
-# Programmatically Creating an HTML Document from Scratch
+## Programmatically Creating an HTML Document from Scratch
 
 This how-to shows you how to build a basic HTML document using the `HtmlDocument` and `HtmlNodeItem` classes. This is useful when you want to programmatically generate HTML content, such as for templating, automation, or internal tools.
 
-## Goal
+### Goal
 
 Create an in-memory HTML document structure that resembles:
 
@@ -21,7 +21,7 @@ Create an in-memory HTML document structure that resembles:
 
 <p>&nbsp;</p>
 
-## Step-by-Step Example (C#)
+### Step-by-Step Example (C#)
 
 ```c#
 using Html;

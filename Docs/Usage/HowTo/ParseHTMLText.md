@@ -1,4 +1,4 @@
-# Parse HTML Text
+## Parse HTML Text
 
 To parse an HTML document, you will generally be using the **HtmlDocument.Parse** method, where there are overloads for various conditions.
 
@@ -6,7 +6,7 @@ A usual type of case follows in the example.
 
 <p>&nbsp;</p>
 
-## Step-by-Step Example (C#)
+### Step-by-Step Example (C#)
 
 ```c#
 using Html;

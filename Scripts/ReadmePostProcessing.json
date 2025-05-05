@@ -1,8 +1,14 @@
 [
 	{
-		"Remarks": "Replace file insertion variable with file content.",
+		"Remarks": "Replace file insertion variable with file content. (3 parameters)",
 		"FindPattern": "(?i:\\{\\s*(?<block>CodeBlock)\\s*,\\s*(?<language>\\w+)\\s*,\\s*(?<filename>[^\\}]+)\\s*\\})",
 		"ReplacePattern": "```${language}\r\nLoadFileContent(${filename})\r\n```",
+		"UseRegEx": 1
+	},
+	{
+		"Remarks": "Replace file insertion variable with directly included content. (2 parameters)",
+		"FindPattern": "(?i:\\{\\s*(?<block>Include)\\s*,\\s*(?<filename>[^\\}]+)\\s*\\})",
+		"ReplacePattern": "LoadFileContent(${filename})",
 		"UseRegEx": 1
 	},
 	{

@@ -1,4 +1,4 @@
-# Programmatically Create an HTML Snippet
+## Programmatically Create an HTML Snippet
 
 Creating a small HTML snippet is as easy as creating a new HtmlNodeItem and populating it. No further configuration is needed.
 
@@ -6,7 +6,7 @@ Once created in memory, it can be merged into other trees, serialized, or proces
 
 Any snippet can be rendered to HTML by reading the **Html** property, the same way you would do with a full HtmlDocument.
 
-## Goal
+### Goal
 
 Create an in-memory HTML node that resembles:
 
@@ -20,7 +20,7 @@ Create an in-memory HTML node that resembles:
 
 <p>&nbsp;</p>
 
-## Step-by-Step Example (C#)
+### Step-by-Step Example (C#)
 
 ```c#
 using Html;
