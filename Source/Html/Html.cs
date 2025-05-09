@@ -31,11 +31,6 @@ namespace Html
 	/// <summary>
 	/// Structured HTML Document.
 	/// </summary>
-	/// <remarks>
-	/// 20230715.1116 - Converted to case-sensitive. At this time, it is the
-	/// responsibility of the HTML author to write all primary HTML in lower
-	/// case.
-	/// </remarks>
 	public class HtmlDocument : HtmlNodeItem
 	{
 		//*************************************************************************
@@ -175,13 +170,7 @@ namespace Html
 			HtmlAttributeCollection attributes)
 		{
 			HtmlAttributeItem attribute = null;
-			//Group nameGroup = null;								//	Working Name Group.
-			//IntRangeCollection irc = new IntRangeCollection();
-			//MatchCollection matches;      //	Working Match Collection.
 			NameValueCollection nameValues = null;
-			//Group valueGroup = null;               //	Working Value Group.
-			//string workingName = "";				//	Working Name.
-			//string workingValue = "";			//	Working Value.
 
 			//	TODO: Place attributes in a desired order of some sort.
 			if(value.Length != 0 && attributes != null)
@@ -201,25 +190,6 @@ namespace Html
 					}
 					attributes.Add(attribute);
 				}
-
-				////	Parse Items with and without values, in or out of quotes.
-				//matches = Regex.Matches(value, ResourceMain.rxHtmlAttributes);
-				//foreach(Match matchItem in matches)
-				//{
-				//	nameGroup = matchItem.Groups["name"];
-				//	valueGroup = matchItem.Groups["value"];
-				//	workingName = "";
-				//	workingValue = "";
-				//	if(nameGroup != null && nameGroup.Value != null)
-				//	{
-				//		workingName = nameGroup.Value;
-				//	}
-				//	if(valueGroup != null && valueGroup.Value != null)
-				//	{
-				//		workingValue = valueGroup.Value.Trim();
-				//	}
-				//	attributes.Add(workingName, workingValue);
-				//}
 			}
 		}
 		//*-----------------------------------------------------------------------*
@@ -553,29 +523,6 @@ namespace Html
 		{
 			return document.Nodes.InsertAfter(afterNode);
 		}
-		////*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
-		///// <summary>
-		///// Insert the provided Html after the specified Node in the appropriate
-		///// level.
-		///// </summary>
-		///// <param name="document">
-		///// Instance of an Html Document Object into which the new Node will be
-		///// inserted.
-		///// </param>
-		///// <param name="afterID">
-		///// The Unique ID to find within the document.
-		///// </param>
-		///// <param name="html">
-		///// Html Content to Insert.
-		///// </param>
-		///// <returns>
-		///// Html Node Item constructed from the caller's HTML.
-		///// </returns>
-		//public static HtmlNodeItem InsertAfter(HtmlDocument document,
-		//	string afterID, string html)
-		//{
-		//	return document.Nodes.InsertAfter(afterID, html);
-		//}
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
@@ -592,22 +539,6 @@ namespace Html
 			set { mLineFeed = value; }
 		}
 		//*-----------------------------------------------------------------------*
-
-		//	TODO: Fix an inheritance problem between HtmlNodeItem.Nodes and
-		//	HtmlDocument.Nodes where this Nodes hides the base property.
-		////*-----------------------------------------------------------------------*
-		////*	Nodes																																	*
-		////*-----------------------------------------------------------------------*
-		////private HtmlNodeCollection mNodes = new HtmlNodeCollection();
-		//private HtmlNodeCollection mNodes = null;
-		///// <summary>
-		///// Get a reference to the main Nodes collection for this Document.
-		///// </summary>
-		//public new HtmlNodeCollection Nodes
-		//{
-		//	get { return mNodes; }
-		//}
-		////*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
 		//*	Parse																																	*
@@ -633,140 +564,6 @@ namespace Html
 			document.IncludeComments = comments;
 			Parse(document.Nodes, html, comments);
 		}
-		////*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
-		///// <summary>
-		///// Iterates the supplied HTML String Collection to construct a basic
-		///// Document.
-		///// </summary>
-		///// <param name="nodes">
-		///// Collection of nodes from which the search is starting.
-		///// </param>
-		///// <param name="elements">
-		///// String Collection containing HTML and Text Elements.
-		///// </param>
-		///// <param name="comments">
-		///// Value indicating whether comments will be included.
-		///// </param>
-		///// <remarks>
-		///// This basic method does not apply rules.
-		///// </remarks>
-		//public static void Parse(HtmlNodeCollection nodes,
-		//	StringCollection elements, bool comments)
-		//{
-		//	string et;          //	Element Type.
-		//	bool ic = false;    //	Flag - In Comment.
-		//	int lc = 0;         //	List Count.
-		//	int lp = 0;         //	List Position.
-		//	HtmlNodeItem nn = null; //	New Node.
-		//	string s;           //	Working String.
-		//	bool sc = false;    //	Singles Closing.
-		//	int si = 0;         //	String Index.
-		//	int sl = 0;         //	String Length.
-		//	string ws = "";     //	Working String.
-
-		//	if(elements != null && nodes != null)
-		//	{
-		//		//	If here, we have string elements and a nodes collection to start
-		//		//	from.
-		//		lc = elements.Count;
-		//		for(lp = 0; lp < lc; lp++)
-		//		{
-		//			s = elements[lp].Trim();
-		//			if(s.IndexOf("<break") >= 0)
-		//			{
-		//				Debug.WriteLine("Break Here", "HtmlDocument.Parse(nodes,elements)");
-		//			}
-		//			if(s.Length > 2 && s.Substring(0, 2) == "<?")
-		//			{
-		//				//	XML opening node.
-		//				nodes.Add(s);
-		//			}
-		//			else if(s.Length > 3 && s.Substring(0, 3) == "<!-")
-		//			{
-		//				//	Comment.
-		//				nn = nodes.Add(s);
-		//				nn.Text = FormatWhitespace(s, comments);
-		//			}
-		//			else if(s?.Length > 0 && s.Substring(0, 1) == "<")
-		//			{
-		//				//						//	If this is an opening character, then at this level, we are
-		//				//						//	only allowed to go inward.
-		//				//						//	Place this item at this level, and the next in that node's
-		//				//						//	collection.
-		//				//						et = GetElementType(s);
-		//				//						nn = nodes.Add(s);
-		//				//						if(s.Length > 2 && s.Substring(s.Length - 2, 1) != "/" &&
-		//				//							s.Substring(1, 1) != "!" && Singles[et] == null)
-		//				//						{
-		//				//							//	If this is not a self-closing element, then continue.
-		//				//							lp = Parse(nn.Nodes, elements, lp + 1);
-		//				//						}
-		//				//	We have an opening brace...
-		//				//							if(s.Length > 9 && s.Substring(0, 9) == "<input id")
-		//				//							{
-		//				//								Debug.WriteLine("Break Here");
-		//				//							}
-		//				et = GetElementType(s);
-		//				sc = false; //	By default, this is not a singles closing tag.
-		//				if(s.Length > 2 && s.Substring(1, 1) == "/")
-		//				{
-		//					//	...and a closing flag, then we need to check to see if this
-		//					//	item's parent is the parent of this tag.
-		//					if(Singles[et] != null)
-		//					{
-		//						sc = true;
-		//					}
-		//					else
-		//					{
-		//						break;
-		//					}
-		//				}
-		//				else if(s.Length >= 4 && s.Substring(0, 4) == "<!--")
-		//				{
-		//					ws = "-->";
-		//					if(s.IndexOf(ws) > 0)
-		//					{
-		//						//	If the closing side is on this element, then check to
-		//						//	see if we have an internal remainder.
-		//						si = s.IndexOf(ws);
-		//						sl = s.Length - (si + 3);
-		//						if(sl > 0)
-		//						{
-		//							s = s.Substring(si, sl);
-		//						}
-		//						else
-		//						{
-		//							s = "";
-		//							sc = true;
-		//						}
-		//					}
-		//					else
-		//					{
-		//						ic = true;
-		//					}
-		//				}
-		//				if(!sc && !ic)
-		//				{
-		//					//	If not a closing flag, then keep going.
-		//					nn = nodes.Add(s);
-		//					if(s.Length > 2 && s.Substring(s.Length - 2, 1) != "/" &&
-		//						s.Substring(1, 1) != "!" && Singles[et] == null)
-		//					{
-		//						//	If this is not a self-closing element, then continue
-		//						//	inward.
-		//						lp = Parse(nn.Nodes, elements, lp + 1, comments);
-		//					}
-		//				}
-		//			}
-		//			else
-		//			{
-		//				// If this is text, then add text on the current item.
-		//				nn = nodes.Add("");
-		//				nn.Text = FormatWhitespace(s, comments);
-		//			}
-		//		}
-		//	}
-		//}
 		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
 		/// <summary>
 		/// Parse the HTML elements token list into individual nodes.
@@ -1005,170 +802,6 @@ namespace Html
 			}
 			return index;
 		}
-		////*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
-		///// <summary>
-		///// Iterates the supplied HTML String Collection to construct a basic
-		///// Document.
-		///// </summary>
-		///// <param name="nodes">
-		///// Collection of nodes from which the search is starting.
-		///// </param>
-		///// <param name="elements">
-		///// String Collection containing HTML and Text Elements.
-		///// </param>
-		///// <param name="index">
-		///// The List Index at which the string parsing will begin.
-		///// </param>
-		///// <param name="comments">
-		///// Value indicating whether comments will be included.
-		///// </param>
-		///// <returns>
-		///// The last Index processed by passes in this level.
-		///// </returns>
-		///// <remarks>
-		///// This basic method does not apply rules.
-		///// </remarks>
-		//public static int Parse(HtmlNodeCollection nodes,
-		//	StringCollection elements, int index, bool comments)
-		//{
-		//	string et = "";     //	Element Type.
-		//	bool ic = false;    //	Flag - In Comment.
-		//	int lc;             //	List Count.
-		//	int lp = index;     //	List Position.
-		//	HtmlNodeItem nn = null;   //	New Node.
-		//	string s;           //	Working String.
-		//	bool sc = false;    //	Singles Closing.
-		//	int si = 0;         //	String Index.
-		//	int sl = 0;         //	String Length.
-		//	string st = "";			//	Trimmed string.
-		//	string ws = "";     //	Working String.
-
-		//	if(elements != null && nodes != null)
-		//	{
-		//		//	If here, we have string elements and a nodes collection to start
-		//		//	from.
-		//		lc = elements.Count;
-		//		for(lp = index; lp < lc; lp++)
-		//		{
-		//			//s = elements[lp].Trim();
-		//			s = elements[lp];
-		//			st = s.Trim();
-		//			if(s.IndexOf("<break") >= 0)
-		//			{
-		//				Debug.WriteLine("Break Here", "HtmlDocument.Parse(nodes,elements,index)");
-		//			}
-		//			if(s.Length != 0)
-		//			{
-		//				if(!ic)
-		//				{
-		//					if(s.Substring(0, 1) == "<")
-		//					{
-		//						//	We have an opening brace...
-		//						//							if(s.Length > 9 && s.Substring(0, 9) == "<input id")
-		//						//							{
-		//						//								Debug.WriteLine("Break Here");
-		//						//							}
-		//						et = GetElementType(s);
-		//						sc = false; //	By default, this is not a singles closing tag.
-		//						if(s.Length > 2 && s.Substring(1, 1) == "/")
-		//						{
-		//							//	...and a closing flag, then we need to check to see if this
-		//							//	item's parent is the parent of this tag.
-		//							if(Singles[et] != null)
-		//							{
-		//								sc = true;
-		//							}
-		//							else
-		//							{
-		//								break;
-		//							}
-		//						}
-		//						else if(s.Length >= 4 && s.Substring(0, 4) == "<!--")
-		//						{
-		//							ws = "-->";
-		//							if(s.IndexOf(ws) > 0)
-		//							{
-		//								//	If the closing side is on this element, then check to
-		//								//	see if we have an internal remainder.
-		//								si = s.IndexOf(ws);
-		//								sl = s.Length - (si + 3);
-		//								if(sl > 0)
-		//								{
-		//									s = s.Substring(si, sl);
-		//								}
-		//								else
-		//								{
-		//									if(comments)
-		//									{
-		//										nn = nodes.Add(s);
-		//									}
-		//									s = "";
-		//									sc = true;
-		//								}
-		//							}
-		//							else
-		//							{
-		//								ic = true;
-		//							}
-		//						}
-		//						if(!sc && !ic)
-		//						{
-		//							//	If not a closing flag, then keep going.
-		//							nn = nodes.Add(s);
-		//							if(st.Length > 2 &&
-		//								st.Substring(st.Length - 2, 1) != "/" &&
-		//								st.Substring(1, 1) != "!" && Singles[et] == null)
-		//							{
-		//								//	If this is not a self-closing element, then continue
-		//								//	inward.
-		//								lp = Parse(nn.Nodes, elements, lp + 1, comments);
-		//							}
-		//						}
-		//					}
-		//					else
-		//					{
-		//						// If this is text, then add text on the current item.
-		//						nn = nodes.AddText(s);
-		//						nn.Text = FormatWhitespace(s, comments);
-		//					}
-		//				}
-		//				else
-		//				{
-		//					//	TODO: This block might never be reached.
-		//					//	If working in a comment, then we need the closing comment
-		//					//	block.
-		//					ws = "-->";
-		//					if(s.IndexOf(ws) > 0)
-		//					{
-		//						//	If the closing side is on this element, then check to
-		//						//	see if we have an internal remainder.
-		//						si = s.IndexOf(ws);
-		//						sl = s.Length - (si + 3);
-		//						if(si >= 0)
-		//						{
-		//							ic = false;
-		//						}
-		//						if(sl > 0)
-		//						{
-		//							s = s.Substring(si + 3, sl);
-		//						}
-		//						else
-		//						{
-		//							s = "";
-		//						}
-		//						if(!ic && s.Length > 0)
-		//						{
-		//							//	If we closed the comment with other items, then
-		//							//	process again.
-		//							nn = nodes.Add(s);
-		//						}
-		//					}
-		//				}
-		//			}
-		//		}
-		//	}
-		//	return lp;
-		//}
 		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
 		/// <summary>
 		/// Parses the supplied HTML String to construct a basic Document.
@@ -1188,189 +821,16 @@ namespace Html
 		public static void Parse(HtmlNodeCollection nodes, string html,
 			bool comments)
 		{
-			//int count = 0;
-			//int index = 0;
 			StringTokenCollection mc;
-			//int nIndex = 0;				//	Next Expected Index.
-			//StringCollection sc = new StringCollection(); //	Flat Finds List.
-			//string value = "";
-			//string ws = "";       //	Working String.
 
 			nodes.ClearAll();
-			//ws = Regex.Replace(html, @"([\r\n]+\s*)+", "&crlfs;");
-			//			//	Convert to one line.
-			//			ws = Regex.Replace(html, @"(?<f>\r\n)", " ");
-			//			//	Remove extra spaces.
-			//			ws = Regex.Replace(html, @"\s+", " ");
 			if(html?.Length != 0 && nodes != null)
 			{
 				//	Get the list of all closed tags.
 				mc = HtmlUtil.GetHtmlElements(html);
 				Parse(nodes, mc, comments);
-				//foreach(StringTokenItem m in mc)
-				//{
-				//	if(nIndex < m.StartIndex)
-				//	{
-				//		//	If the next expected index is less than the actual current
-				//		//	index, then this is a text entry.
-				//		//	Debug.WriteLine("Text: " + html.Substring(nIndex, m.Index - nIndex), "HtmlDocument.Parse");
-				//		value = ws.Substring(nIndex, m.StartIndex - nIndex);
-				//		if(value != "&crlfs;")
-				//		{
-				//			//if(comments)
-				//			//{
-				//			//	sc.Add(value.Replace("&crlfs;", "\r\n"));
-				//			//}
-				//			//else
-				//			//{
-				//			//	sc.Add(value);
-				//			//}
-				//			sc.Add(value);
-				//		}
-				//	}
-				//	//	Debug.WriteLine("Node: " + m.Value, "HtmlDocument.Parse");
-				//	sc.Add(m.Value);
-				//	nIndex = m.StartIndex + m.Length;
-				//}
-				//if(nIndex < ws.Length)
-				//{
-				//	//	If we have trailing text, then add it beside the last tag.
-				//	//	Debug.WriteLine("Tail: " + html.Substring(nIndex, html.Length - nIndex), "HtmlDocument.Parse");
-				//	value = ws.Substring(nIndex, ws.Length - nIndex);
-				//	if(value != "&crlfs;")
-				//	{
-				//		sc.Add(value);
-				//	}
-				//}
-				//count = sc.Count;
-				//for(index = 0; index < count; index++)
-				//{
-				//	if(sc[index].IndexOf("&crlfs;") > -1)
-				//	{
-				//		//sc[index] = sc[index].Replace("&crlfs;", " ");
-				//		if(comments)
-				//		{
-				//			sc[index] = sc[index].Replace("&crlfs;", "\r\n") + "\r\n";
-				//		}
-				//		else
-				//		{
-				//			sc[index] = sc[index].Replace("&crlfs;", " ");
-				//		}
-				//	}
-				//}
-				//Parse(nodes, sc, comments);
 			}
 		}
-		////*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
-		///// <summary>
-		///// Parses the supplied HTML String to fill an existing node and its
-		///// children.
-		///// </summary>
-		///// <param name="node">
-		///// Instance of a Node from which the search is starting.
-		///// </param>
-		///// <param name="html">
-		///// String containing HTML formatted information.
-		///// </param>
-		///// <param name="comments">
-		///// Value indicating whether comments will be included.
-		///// </param>
-		///// <remarks>
-		///// This basic method does not apply rules.
-		///// </remarks>
-		//public static void Parse(HtmlNodeItem node, string html, bool comments)
-		//{
-		//	int count = 0;
-		//	string et = ""; //	Element Type.
-		//	int index = 0;
-		//	MatchCollection mc;	//	Matches.
-		//	int nIndex = 0;                         //	Next Expected Index.
-		//	string s = "";                          //	Working String.
-		//	StringCollection sc = new StringCollection(); //	Flat Finds List.
-		//	string value = "";
-		//	string ws;                              //	Working String.
-
-		//	node.Attributes.Clear();
-		//	node.Nodes.ClearAll();
-		//	node.NodeType = "";
-		//	node.Text = "";
-
-		//	ws = Regex.Replace(html, @"([\r\n]+\s*)+", "&crlfs;");
-		//	if(ws.Length != 0 && node != null)
-		//	{
-		//		//	Get the list of all closed tags.
-		//		mc = Regex.Matches(ws, ResourceMain.rxHtmlTags);
-		//		foreach(Match m in mc)
-		//		{
-		//			if(nIndex < m.Index)
-		//			{
-		//				//	If the next expected index is less than the actual current
-		//				//	index, then this is a text entry.
-		//				value = ws.Substring(nIndex, m.Index - nIndex);
-		//				if(value != "&crlfs;")
-		//				{
-		//					sc.Add(value);
-		//				}
-		//			}
-		//			sc.Add(m.Value);
-		//			nIndex = m.Index + m.Length;
-		//		}
-		//		if(nIndex < html.Length)
-		//		{
-		//			//	If we have trailing text, then add it beside the last tag.
-		//			value = ws.Substring(nIndex, ws.Length - nIndex);
-		//			if(value != "&crlfs;")
-		//			{
-		//				sc.Add(value);
-		//			}
-		//		}
-		//		if(sc.Count != 0)
-		//		{
-		//			count = sc.Count;
-		//			for(index = 0; index < count; index++)
-		//			{
-		//				//sc[index] = sc[index].Replace("&crlfs;", " ");
-		//				if(comments)
-		//				{
-		//					sc[index] = sc[index].Replace("&crlfs;", "\r\n");
-		//				}
-		//				else
-		//				{
-		//					sc[index] = sc[index].Replace("&crlfs;", " ");
-		//				}
-		//			}
-		//			//	If we have at least one string, then the first string is destined
-		//			//	for the active node.
-		//			s = sc[0];
-		//			if(s.Substring(0, 1) == "<")
-		//			{
-		//				//	If this is an opening character, then at this level, we are
-		//				//	only allowed to go inward.
-		//				//	Place this item at this level, and the next in that node's
-		//				//	collection.
-		//				et = GetElementType(s);
-		//				node.NodeType = et;
-		//				AssignAttributes(s, node.Attributes);
-		//				if(s.Length > 2 && s.Substring(s.Length - 2, 1) != "/" &&
-		//					s.Substring(1, 1) != "!" && Singles[et] == null)
-		//				{
-		//					//	If this is not a self-closing element, then continue.
-		//					sc.RemoveAt(0);
-		//				}
-		//			}
-		//			else
-		//			{
-		//				// If this is text, then add text on the current item.
-		//				sc.RemoveAt(0);
-		//				node.Text = FormatWhitespace(s, comments);
-		//			}
-		//			if(sc.Count != 0)
-		//			{
-		//				Parse(node.Nodes, sc, comments);
-		//			}
-		//		}
-		//	}
-		//}
 		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
 		/// <summary>
 		/// Parses the supplied HTML String to construct a basic Document.
@@ -1465,24 +925,12 @@ namespace Html
 		}
 		//*-----------------------------------------------------------------------*
 
-		////*-----------------------------------------------------------------------*
-		////*	SelfClosing																														*
-		////*-----------------------------------------------------------------------*
-		//private bool mSelfClosing = true;
-		///// <summary>
-		///// Get/Set a value indicating whether the HTML elements are self-closing
-		///// if no child elements or text exist on them.
-		///// </summary>
-		//public bool SelfClosing
-		//{
-		//	get { return mSelfClosing; }
-		//	set { mSelfClosing = value; }
-		//}
-		////*-----------------------------------------------------------------------*
-
 		//*-----------------------------------------------------------------------*
 		//*	Singles																																*
 		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="Singles">Singles</see>.
+		/// </summary>
 		private static NameCollection mSingles =
 			new NameCollection();
 		/// <summary>
