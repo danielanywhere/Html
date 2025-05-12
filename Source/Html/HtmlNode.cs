@@ -262,6 +262,27 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* AddRange																															*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Add a series of HTML nodes to this list.
+		/// </summary>
+		/// <param name="collection">
+		/// Reference to the collection of items to add.
+		/// </param>
+		public new void AddRange(IEnumerable<HtmlNodeItem> collection)
+		{
+			if(collection?.Count() > 0)
+			{
+				foreach(HtmlNodeItem nodeItem in collection)
+				{
+					this.Add(nodeItem);
+				}
+			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//* AddText																																*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
