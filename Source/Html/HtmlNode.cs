@@ -94,6 +94,10 @@ namespace Html
 				Index = this.Count,
 				Parent = this
 			};
+			if(this.ParentNode != null)
+			{
+				this.ParentNode.SelfClosing = false;
+			}
 
 			base.Add(ro);
 			return ro;
@@ -107,12 +111,20 @@ namespace Html
 		/// </param>
 		public new void Add(HtmlNodeItem value)
 		{
-			if(value.Parent == null)
+			if(value != null)
 			{
-				value.Index = this.Count;
-				value.Parent = this;
+				if(value.Parent == null)
+				{
+					value.Index = this.Count;
+					value.Parent = this;
+				}
+				if(this.ParentNode != null)
+				{
+					this.ParentNode.SelfClosing = false;
+				}
+
+				base.Add(value);
 			}
-			base.Add(value);
 		}
 		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
 		/// <summary>
@@ -141,6 +153,11 @@ namespace Html
 			{
 				node = new HtmlNodeItem("div");
 			}
+			if(this.ParentNode != null)
+			{
+				this.ParentNode.SelfClosing = false;
+			}
+
 			this.Add(node);
 			return node;
 		}
@@ -207,6 +224,10 @@ namespace Html
 					HtmlDocument.AssignAttributes(working, ro.Attributes);
 				}
 			}
+			if(this.ParentNode != null)
+			{
+				this.ParentNode.SelfClosing = false;
+			}
 
 			return ro;
 		}
@@ -256,6 +277,11 @@ namespace Html
 					HtmlDocument.AssignAttributes(value, ro.Attributes);
 				}
 			}
+			if(this.ParentNode != null)
+			{
+				this.ParentNode.SelfClosing = false;
+			}
+
 
 			return ro;
 		}
@@ -308,6 +334,11 @@ namespace Html
 				ro.NodeType = "";
 				ro.Text = value;
 			}
+			if(this.ParentNode != null)
+			{
+				this.ParentNode.SelfClosing = false;
+			}
+
 
 			return ro;
 		}
