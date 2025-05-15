@@ -193,6 +193,7 @@ namespace Html
 		/// </returns>
 		public static NameValueCollection GetHtmlAttributes(string element)
 		{
+			bool bContinue = true;
 			StringBuilder builder = new StringBuilder();
 			char[] chars = null;
 			char charVal = char.MinValue;
@@ -202,13 +203,13 @@ namespace Html
 			char inQuote = char.MinValue;
 			NameValueItem item = null;
 			NameValueCollection results = new NameValueCollection();
-			int state = 0;		// 0 - Brace; 1 - Element name; 2 - Name; 3 - Value
+			int state = 0;    // 0 - Brace; 1 - Element name; 2 - Name; 3 - Value
 
 			if(element?.Length > 0)
 			{
 				chars = element.ToCharArray();
 				count = chars.Length;
-				for(index = 0; index < count; index ++)
+				for(index = 0; index < count; index++)
 				{
 					charVal = chars[index];
 					switch(state)
@@ -316,6 +317,11 @@ namespace Html
 										Clear(builder);
 										state--;
 									}
+									if(charVal == '/' || charVal == '>')
+									{
+										//	End of element.
+										bContinue = false;
+									}
 								}
 								else
 								{
@@ -325,6 +331,10 @@ namespace Html
 								}
 							}
 							break;
+					}
+					if(!bContinue)
+					{
+						break;
 					}
 				}
 			}
@@ -461,7 +471,7 @@ namespace Html
 				result.Original = content;
 				chars = content.ToCharArray();
 				count = chars.Length;
-				for(index = 0; index < count; index ++)
+				for(index = 0; index < count; index++)
 				{
 					//if(index == 1012)
 					//{
@@ -684,6 +694,40 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//*	HtmlNodeTypes																													*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="HtmlNodeTypes">HtmlNodeTypes</see>.
+		/// </summary>
+		private static List<string> mHtmlNodeTypes = new List<string>
+		{
+			"!--", "!doctype", "a", "abbr", "acronym", "address", "applet", "area",
+			"article", "aside", "audio", "b", "base", "basefont", "bdi", "bdo",
+			"big", "blockquote", "body", "br", "button", "canvas", "caption",
+			"center", "cite", "code", "col", "colgroup", "data", "datalist", "dd",
+			"del", "details", "dfn", "dialog", "dir", "div", "dl", "dt", "em",
+			"embed", "fieldset", "figcaption", "figure", "font", "footer", "form",
+			"frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "h7", "h8",
+			"h9", "head", "header", "hgroup", "hr", "html", "i", "iframe", "img",
+			"input", "ins", "kbd", "label", "legend", "li", "link", "main", "map",
+			"mark", "menu", "meta", "meter", "nav", "noframes", "noscript", "object",
+			"ol", "optgroup", "option", "output", "p", "param", "picture", "pre",
+			"progress", "q", "rp", "rt", "ruby", "s", "samp", "script", "search",
+			"section", "select", "small", "source", "span", "strike", "strong",
+			"style", "sub", "summary", "sup", "svg", "table", "tbody", "td",
+			"template", "textarea", "tfoot", "th", "thead", "time", "title", "tr",
+			"track", "tt", "u", "ul", "var", "video", "wbr"
+		};
+		/// <summary>
+		/// Get a reference to the collection of known HTML node types.
+		/// </summary>
+		public static List<string> HtmlNodeTypes
+		{
+			get { return mHtmlNodeTypes; }
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//* RemoveOuterQuotes																											*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -716,6 +760,29 @@ namespace Html
 				}
 			}
 			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	Singles																																*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="Singles">Singles</see>.
+		/// </summary>
+		private static List<string> mSingles =
+			new List<string>
+			{
+				"?", "!doctype", "base", "basefont", "bgsound", "br", "col",
+				"embed", "frame", "hr", "img", "input", "link", "meta", "param",
+				"wbr"
+			};
+		/// <summary>
+		/// Get a reference to a list of Single Elements not requiring a Closing
+		/// Tag.
+		/// </summary>
+		public static List<string> Singles
+		{
+			get { return mSingles; }
 		}
 		//*-----------------------------------------------------------------------*
 

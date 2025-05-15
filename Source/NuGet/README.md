@@ -232,6 +232,7 @@ public class HtmlBuilderExample
 
 | Version | Description |
 |---------|-------------|
+| 25.2515.3752 | The static **Singles** property has been moved from **HtmlDocument** to **HtmlUtil**, and is now initialized at startup; **HtmlDocument.Singles** has been depreciated; static read-only **HtmlUtil.HtmlNodeTypes** property has been added to return all of the currently known HTML node types. |
 | 25.2513.3949 | When child nodes are added to an **HtmlNodeItem**, the parent node's **SelfClosing** property is now reset automatically. |
 | 25.2504.3941 | Change in assembly name; single element node tags have been made case-insensitive; **HtmlNodeItem(string nodeType, string text)** constructor overload has been added to accept node type and text; **HtmlNodeItem.ToString()** now returns the item's node type to aid in debugging. |
 | 25.2502.4550 | Initial public release. |

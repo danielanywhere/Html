@@ -649,7 +649,8 @@ namespace Html
 						//	Normal-looking element.
 						eType = GetElementType(element);
 						selfClosing = false;
-						if(element.Trim().EndsWith("/>") || Singles[eType] != null)
+						if(element.Trim().EndsWith("/>") ||
+							HtmlUtil.Singles.Exists(x => x == eType))
 						{
 							selfClosing = true;
 						}
@@ -769,7 +770,8 @@ namespace Html
 						//	Normal-looking element.
 						eType = GetElementType(element);
 						selfClosing = false;
-						if(element.Trim().EndsWith("/>") || Singles[eType] != null)
+						if(element.Trim().EndsWith("/>") ||
+							HtmlUtil.Singles.Exists(x => x == eType))
 						{
 							selfClosing = true;
 						}
@@ -937,6 +939,7 @@ namespace Html
 		/// Get a reference to a list of Single Elements not requiring a Closing
 		/// Tag.
 		/// </summary>
+		[Obsolete("Please use HtmlUtil.Singles.")]
 		public static NameCollection Singles
 		{
 			get
