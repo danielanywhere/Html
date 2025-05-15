@@ -1001,7 +1001,8 @@ namespace Html
 							sb.Append(ni.Text);
 							sb.Append(ni.Nodes.Html);
 							//	If this item has a closing tag, then close it when done.
-							if(HtmlUtil.Singles.Exists(x => x == ni.NodeType))
+							if(!HtmlUtil.Singles.Exists(x =>
+								x.ToLower() == ni.NodeType.ToLower()))
 							{
 								bFeed = false;
 								sb.Append("</" + ni.NodeType + ">");
@@ -1663,7 +1664,8 @@ namespace Html
 			{
 				string rs = "";
 
-				if(NodeType.Length != 0 && HtmlUtil.Singles.Exists(x => x == NodeType))
+				if(NodeType.Length != 0 &&
+					!HtmlUtil.Singles.Exists(x => x.ToLower() == NodeType.ToLower()))
 				{
 					//	If this is an element, and not a single, then get the
 					//	closing tag.
@@ -2365,7 +2367,7 @@ namespace Html
 						sb.Append(Nodes.Html);
 					}
 					//	If this item has a closing tag, then close it when done.
-					if(HtmlUtil.Singles.Exists(x => x == NodeType))
+					if(!HtmlUtil.Singles.Exists(x => x.ToLower() == NodeType.ToLower()))
 					{
 						if(SelfClosing && Nodes.Count == 0)
 						{

@@ -650,7 +650,7 @@ namespace Html
 						eType = GetElementType(element);
 						selfClosing = false;
 						if(element.Trim().EndsWith("/>") ||
-							HtmlUtil.Singles.Exists(x => x == eType))
+							HtmlUtil.Singles.Exists(x => x.ToLower() == eType.ToLower()))
 						{
 							selfClosing = true;
 						}
@@ -771,7 +771,7 @@ namespace Html
 						eType = GetElementType(element);
 						selfClosing = false;
 						if(element.Trim().EndsWith("/>") ||
-							HtmlUtil.Singles.Exists(x => x == eType))
+							HtmlUtil.Singles.Exists(x => x.ToLower() == eType.ToLower()))
 						{
 							selfClosing = true;
 						}
