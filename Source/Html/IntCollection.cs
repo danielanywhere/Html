@@ -379,6 +379,12 @@ namespace Html
 		/// <summary>
 		/// Return the High Value of Items in the specified Collection.
 		/// </summary>
+		/// <param name="value">
+		/// Reference to the collection to search.
+		/// </param>
+		/// <returns>
+		/// The high value found in the collection.
+		/// </returns>
 		public static int GetHighValue(IntCollection value)
 		{
 			int rv = 0;
@@ -400,6 +406,12 @@ namespace Html
 		/// <summary>
 		/// Return the Low Value of Items in the specified Collection.
 		/// </summary>
+		/// <param name="value">
+		/// Reference to the collection to search.
+		/// </param>
+		/// <returns>
+		/// The low value found in the collection.
+		/// </returns>
 		public static int GetLowValue(IntCollection value)
 		{
 			bool br = true;   //	Reset.
@@ -742,6 +754,12 @@ namespace Html
 		/// <summary>
 		/// Return the sum of the caller's Int Collection.
 		/// </summary>
+		/// <param name="value">
+		/// Reference to the collection to be summed.
+		/// </param>
+		/// <returns>
+		/// The sum of all entries in the collection.
+		/// </returns>
 		public static int Sum(IntCollection value)
 		{
 			int rv = 0;

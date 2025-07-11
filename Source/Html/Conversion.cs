@@ -1576,6 +1576,9 @@ namespace Html
 		/// <param name="value2">
 		/// Multiplier.
 		/// </param>
+		/// <returns>
+		/// The result of the multiplication.
+		/// </returns>
 		/// <remarks>
 		/// This method requires that both values be numeric, or null will be
 		/// returned.

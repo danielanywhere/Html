@@ -339,6 +339,32 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* GetValue																															*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return the value of the specified attribute from the list.
+		/// </summary>
+		/// <param name="attributeName">
+		/// Name of the attribute to find.
+		/// </param>
+		/// <returns>
+		/// Value of the specified attribute, if found. Otherwise, an empty string.
+		/// </returns>
+		public string GetValue(string attributeName)
+		{
+			HtmlAttributeItem attrib = null;
+			string result = "";
+
+			attrib = this.FirstOrDefault(x => x.Name == attributeName);
+			if(attrib != null)
+			{
+				result = attrib.Value;
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//*	HasAttribute																													*
 		//*-----------------------------------------------------------------------*
 		/// <summary>

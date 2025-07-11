@@ -737,7 +737,27 @@ namespace Html
 						if(comments)
 						{
 							node = nodes.Add(element);
-							node.Text = FormatWhitespace(element, comments);
+							//	This line has been removed to avoid any confusion with
+							//	Text property usage. In this version, please refer to
+							//	the OriginalText property for comment content.
+							//node.Text = FormatWhitespace(element, comments);
+						}
+						//	Add an end-cap for inner text directly following comment.
+						if(index + 1 < count)
+						{
+							tokenEnd = token.StartIndex + token.Length;
+							tokenNextStart = tokens[index + 1].StartIndex;
+							if(tokenNextStart > tokenEnd)
+							{
+								text = tokens.Original.Substring(tokenEnd,
+									tokenNextStart - tokenEnd);
+								//	End cap gets its own blank sibling node.
+								node = new HtmlNodeItem()
+								{
+									Text = text
+								};
+								nodes.Add(node);
+							}
 						}
 					}
 					else if(element.Length > 2 && element.Substring(0, 2) == "</")
@@ -755,6 +775,7 @@ namespace Html
 									tokenNextStart - tokenEnd);
 								if(nodes.ParentNode != null && nodes.ParentNode.Parent != null)
 								{
+									//	End cap gets its own blank sibling node.
 									node = new HtmlNodeItem()
 									{
 										Text = text

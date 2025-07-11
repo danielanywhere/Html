@@ -168,6 +168,9 @@ namespace Html
 		/// <param name="value">
 		/// Element formatted content.
 		/// </param>
+		/// <returns>
+		/// Reference to the newly created and added node.
+		/// </returns>
 		public HtmlNodeItem Add(string value)
 		{
 			//			MatchCollection mc;											//	Matches.
@@ -241,6 +244,9 @@ namespace Html
 		/// <param name="parse">
 		/// Value indicating whether or not to parse multiple nodes in value.
 		/// </param>
+		/// <returns>
+		/// Reference to the newly created and added node.
+		/// </returns>
 		public HtmlNodeItem Add(string value, bool parse)
 		{
 			//			MatchCollection mc;											//	Matches.
@@ -350,25 +356,64 @@ namespace Html
 		/// <summary>
 		/// Append items matching the specified pattern to the list of items.
 		/// </summary>
+		/// <param name="nodes">
+		/// Reference to the colleciton of nodes being searched.
+		/// </param>
 		/// <param name="targetItems">
 		/// Reference to the collection of target items.
 		/// </param>
 		/// <param name="match">
 		/// Reference to the function pattern to match.
 		/// </param>
-		public void AppendMatches(List<HtmlNodeItem> targetItems,
+		public static void AppendMatches(
+			List<HtmlNodeItem> nodes,
+			List<HtmlAttributeItem> targetItems,
+			Func<HtmlAttributeItem, bool> match)
+		{
+			if(nodes?.Count > 0 && targetItems != null && match != null)
+			{
+				foreach(HtmlNodeItem nodeItem in nodes)
+				{
+					foreach(HtmlAttributeItem attributeItem in nodeItem.Attributes)
+					{
+						if(match.Invoke(attributeItem) &&
+							!targetItems.Contains(attributeItem))
+						{
+							targetItems.Add(attributeItem);
+						}
+					}
+					AppendMatches(nodeItem.Nodes, targetItems, match);
+				}
+			}
+		}
+		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
+		/// <summary>
+		/// Append items matching the specified pattern to the list of items.
+		/// </summary>
+		/// <param name="nodes">
+		/// Reference to the collection of source nodes to search.
+		/// </param>
+		/// <param name="targetItems">
+		/// Reference to the collection of target items.
+		/// </param>
+		/// <param name="match">
+		/// Reference to the function pattern to match.
+		/// </param>
+		public static void AppendMatches(
+			List<HtmlNodeItem> nodes,
+			List<HtmlNodeItem> targetItems,
 			Func<HtmlNodeItem, bool> match)
 		{
-			if(targetItems != null && match != null)
+			if(nodes?.Count > 0 && targetItems != null && match != null)
 			{
-				foreach(HtmlNodeItem nodeItem in this)
+				foreach(HtmlNodeItem nodeItem in nodes)
 				{
 					if(match.Invoke(nodeItem) &&
 						!targetItems.Contains(nodeItem))
 					{
 						targetItems.Add(nodeItem);
 					}
-					nodeItem.Nodes.AppendMatches(targetItems, match);
+					AppendMatches(nodeItem.Nodes, targetItems, match);
 				}
 			}
 		}
@@ -507,10 +552,58 @@ namespace Html
 					{
 						result.Add(nodeItem);
 					}
-					nodeItem.Nodes.AppendMatches(result, match);
+					AppendMatches(nodeItem.Nodes, result, match);
 				}
 			}
 			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* FindMatchingAttributes																								*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a list of attributes from the nodes in the caller's collection
+		/// that match the specified value.
+		/// </summary>
+		/// <param name="nodes">
+		/// Reference to the collection of nodes to be searched.
+		/// </param>
+		/// <param name="match">
+		/// Reference to the matching predicate.
+		/// </param>
+		/// <param name="recurse">
+		/// Optional value indicating whether to recurse in levels. Default =
+		/// true.
+		/// </param>
+		/// <returns>
+		/// Reference to a list of attributes, if any matches were found.
+		/// Otherwise, an empty list.
+		/// </returns>
+		public static List<HtmlAttributeItem> FindMatchingAttributes(
+			HtmlNodeCollection nodes,
+			Func<HtmlAttributeItem, bool> match, bool recurse = true)
+		{
+			List<HtmlAttributeItem> attributes = new List<HtmlAttributeItem>();
+
+			if(nodes?.Count > 0)
+			{
+				foreach(HtmlNodeItem nodeItem in nodes)
+				{
+					foreach(HtmlAttributeItem attributeItem in nodeItem.Attributes)
+					{
+						if(match.Invoke(attributeItem))
+						{
+							attributes.Add(attributeItem);
+						}
+					}
+					if(recurse)
+					{
+						AppendMatches(nodeItem.Nodes, attributes, match);
+					}
+				}
+			}
+			return attributes;
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -1011,11 +1104,13 @@ namespace Html
 								{
 									if(index + 1 < this.Count)
 									{
+										//if(this[index + 1].NodeType.Length == 0 &&
+										//	(this[index + 1].Text.StartsWith('\r') ||
+										//	this[index + 1].Text.StartsWith('\n')))
 										if(this[index + 1].NodeType.Length == 0 &&
-											(this[index + 1].Text.StartsWith('\r') ||
-											this[index + 1].Text.StartsWith('\n')))
-										{
-											bFeed = false;
+											this[index + 1].Text.Trim().Length > 0)
+											{
+												bFeed = false;
 										}
 									}
 								}
@@ -2384,6 +2479,10 @@ namespace Html
 				else if(NodeType == "!--")
 				{
 					sb.Append(mOriginal);
+					//	Uncomment this line if you want to include inner text
+					//	end caps on the end of the comment object, instead of
+					//	including them as separate blank siblings.
+					//sb.Append(Text);
 				}
 				else
 				{
@@ -2586,6 +2685,9 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 		//*	Nodes																																	*
 		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Internal member for <see cref="Nodes">Nodes</see>.
+		/// </summary>
 		internal HtmlNodeCollection mNodes = new HtmlNodeCollection();
 		/// <summary>
 		/// Get a reference to the Nodes collection for this Item.

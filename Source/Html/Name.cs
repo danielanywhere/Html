@@ -282,6 +282,9 @@ namespace Html
 		/// <summary>
 		/// Return the String equivalent of this Item.
 		/// </summary>
+		/// <returns>
+		/// String representation of this item.
+		/// </returns>
 		public override string ToString()
 		{
 			return mName;
