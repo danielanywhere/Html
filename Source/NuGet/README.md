@@ -232,6 +232,7 @@ public class HtmlBuilderExample
 
 | Version | Description |
 |---------|-------------|
+| 25.2806.4417 | An element name is now allowed to contain hyphens, underscores, and digits after the first character, which must be a letter; **HtmlNodeItem.InnerHtml** now returns the combined content of the node's **Text** and **Nodes.Html** properties. |
 | 25.2711.4233 | Any inner text following a comment block is now parsed into the object model as a blank sibling to that comment with its Text property set; an issue where the trailing text at the end of a child node was being placed on a new line has been resolved; instance-level **GetValue(string attributeName)** function has been added to the **HtmlAttributeCollection** class, to match the **GetStyle(string styleName)** function. |
 | 25.2515.4053 | A bug was fixed that had been introduced in version 25.2515.3752. The error was that no HTML nodes had closing tags. |
 | 25.2515.3752 | The static **Singles** property has been moved from **HtmlDocument** to **HtmlUtil**, and is now initialized at startup; **HtmlDocument.Singles** has been depreciated; static read-only **HtmlUtil.HtmlNodeTypes** property has been added to return all of the currently known HTML node types. |

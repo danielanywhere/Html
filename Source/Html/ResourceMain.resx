@@ -130,7 +130,7 @@
     <comment>Regular expression for extracting the text from an HTML comment.</comment>
   </data>
   <data name="rxHtmlElementType" xml:space="preserve">
-    <value>(&lt;/|&lt;)(?&lt;result&gt;(\?|\!--|\!\w+(:\w+){0,1}|\w+(:\w+){0,1}))</value>
+    <value>(&lt;/|&lt;)(?&lt;result&gt;(\?|\!--|\!([A-Za-z]+([A-Za-z0-9-_\.])*){0,1}(:([A-Za-z]+([A-Za-z0-9-_\.])*){0,1}){0,1}|([A-Za-z]+([A-Za-z0-9-_\.])*){0,1}(:([A-Za-z]+([A-Za-z0-9-_\.])*){0,1}){0,1}))</value>
     <comment>Regular expression for extracting the HTML element type.</comment>
   </data>
   <data name="rxHtmlTags" xml:space="preserve">

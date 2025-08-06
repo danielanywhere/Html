@@ -88,7 +88,7 @@ namespace Html {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to (&lt;/|&lt;)(?&lt;result&gt;(\?|\!--|\!\w+(:\w+){0,1}|\w+(:\w+){0,1})).
+        ///   Looks up a localized string similar to (&lt;/|&lt;)(?&lt;result&gt;(\?|\!--|\!([A-Za-z]+([A-Za-z0-9-_\.])*){0,1}(:([A-Za-z]+([A-Za-z0-9-_\.])*){0,1}){0,1}|([A-Za-z]+([A-Za-z0-9-_\.])*){0,1}(:([A-Za-z]+([A-Za-z0-9-_\.])*){0,1}){0,1})).
         /// </summary>
         internal static string rxHtmlElementType {
             get {

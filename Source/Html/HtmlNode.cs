@@ -2518,7 +2518,7 @@ namespace Html
 		/// </summary>
 		public string InnerHtml
 		{
-			get { return Nodes.Html; }
+			get { return $"{mText}{Nodes.Html}"; }
 			set { Nodes.Html = value; }
 		}
 		//*-----------------------------------------------------------------------*

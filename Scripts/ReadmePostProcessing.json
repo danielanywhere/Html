@@ -18,6 +18,18 @@
 		"UseRegEx": 1
 	},
 	{
+		"Remarks": "Add manually defined on-page links.",
+		"FindPattern": "(?i:\\{\\s*(?<block>Link)\\s*,\\s*(?<text>[^,]+)\\s*,\\s*(?<link>[^\\}]+)\\s*\\})",
+		"ReplacePattern": "[${text}](#${link})",
+		"UseRegEx": 1
+	},
+	{
+		"Remarks": "Remove italic formatting from link text.",
+		"FindPattern": "\\[\\*(?<normalTextPart>[^\\*]+)\\*\\]",
+		"ReplacePattern": "[${normalTextPart}]",
+		"UseRegEx": 1
+	},
+	{
 		"Remarks": "Set the marked content to big.",
 		"FindPattern": "(?s:(?i:( |\\t)*\\{big\\}(?<lineContent>.*?)( |\\t)*\\{/big\\}))",
 		"ReplacePattern": "<h3>${lineContent}</h3>",

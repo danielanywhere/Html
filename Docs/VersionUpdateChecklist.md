@@ -2,7 +2,7 @@
 
 Perform the following tasks when publishing a new version of *Dans.Html.Library*.
 
- - [ ] Make any changes necessary to **ReadMe.docx** and run **CreateReadMe.cmd**, if applicable.
+ - [ ] Make any changes necessary to **ReadMe.odt** and run **CreateReadMe.cmd**, if applicable.
  - [ ] Make sure the project is in **Debug** mode.
  - [ ] Update the version number in **Html.csproj**.
  - [ ] Compile and test all changes to the library.
