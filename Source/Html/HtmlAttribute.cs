@@ -646,6 +646,23 @@ namespace Html
 		//*	Public																																*
 		//*************************************************************************
 		//*-----------------------------------------------------------------------*
+		//*	AssignmentSpace																												*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="AssignmentSpace">AssignmentSpace</see>.
+		/// </summary>
+		private string mAssignmentSpace = "";
+		/// <summary>
+		/// Get/Set the space that was found with the assignment.
+		/// </summary>
+		public string AssignmentSpace
+		{
+			get { return mAssignmentSpace; }
+			set { mAssignmentSpace = value; }
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//* GetStyle																															*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -761,6 +778,23 @@ namespace Html
 		{
 			get { return mPresence; }
 			set { mPresence = value; }
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	PreSpace																															*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="PreSpace">PreSpace</see>.
+		/// </summary>
+		private string mPreSpace = "";
+		/// <summary>
+		/// Get/Set the space preserved prior to the beginning of this item.
+		/// </summary>
+		public string PreSpace
+		{
+			get { return mPreSpace; }
+			set { mPreSpace = value; }
 		}
 		//*-----------------------------------------------------------------------*
 

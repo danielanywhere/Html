@@ -46,7 +46,6 @@ namespace HtmlTests
 		private static void CreateHtmlDocumentFromContent()
 		{
 			StringBuilder builder = new StringBuilder();
-			Match match = null;
 
 			builder.Append(@"<!DOCTYPE html>
 				<html>
@@ -59,32 +58,7 @@ namespace HtmlTests
 					</body>
 				</html>");
 
-			//	Notice that in the following document, there will be multiple
-			//	nodes under the html, head, body, and body nodes that have a blank
-			//	NodeType property. This is done to preserve line feeds in the
-			//	original content. To remove all line-feeds from the content
-			//	prior to using the data for processing, you can filter it all
-			//	out using something like:
-			//   doc.Nodes.RemoveAll(x => x.NodeType == "" &&
-			//	  Regex.IsMatch(x.Text, $"[\r\n\t ]{{{x.Text.Length}}}"));
-			//	... which will remove all blank nodes in the document that only
-			//	define whitespace.
-			HtmlDocument doc = HtmlDocument.Parse(builder.ToString(), true);
-
-			//	Remove all inter-node whitespace preservation nodes, which are blank.
-			//	The following code is a more manual alternative to the single line
-			//	in the previous description.
-			List<HtmlNodeItem> matchingNodes =
-				doc.Nodes.FindMatches(x => x.NodeType == "");
-			foreach(HtmlNodeItem matchingNodeItem in matchingNodes)
-			{
-				match = Regex.Match(matchingNodeItem.Text,
-					$"[\r\n\t ]{{{matchingNodeItem.Text.Length}}}");
-				if(match.Success)
-				{
-					matchingNodeItem.Parent.Remove(matchingNodeItem);
-				}
-			}
+			HtmlDocument doc = HtmlDocument.Parse(builder.ToString(), true, false);
 
 			//	Trim the text of all of the nodes.
 			List<HtmlNodeItem> flatNodesList =

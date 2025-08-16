@@ -182,32 +182,7 @@ public class HtmlBuilderExample
      </body>
     </html>");
 
-   // Notice that in the following document, there will be multiple
-   // nodes under the html, head, body, and body nodes that have a blank
-   // NodeType property. This is done to preserve line feeds in the
-   // original content. To remove all line-feeds from the content
-   // prior to using the data for processing, you can filter it all
-   // out using something like:
-   //   doc.Nodes.RemoveAll(x => x.NodeType == "" &&
-   //   Regex.IsMatch(x.Text, $"[\r\n\t ]{{{x.Text.Length}}}"));
-   // ... which will remove all blank nodes in the document that only
-   // define whitespace.
-   HtmlDocument doc = HtmlDocument.Parse(builder.ToString(), true);
-
-   // Remove all inter-node whitespace preservation nodes, which are blank.
-   // The following code is a more manual alternative to the single line
-   // in the previous description.
-   List<HtmlNodeItem> matchingNodes =
-    doc.Nodes.FindMatches(x => x.NodeType == "");
-   foreach(HtmlNodeItem matchingNodeItem in matchingNodes)
-   {
-    match = Regex.Match(matchingNodeItem.Text,
-     $"[\r\n\t ]{{{matchingNodeItem.Text.Length}}}");
-    if(match.Success)
-    {
-     matchingNodeItem.Parent.Remove(matchingNodeItem);
-    }
-   }
+   HtmlDocument doc = HtmlDocument.Parse(builder.ToString(), true, false);
 
    // Trim the text of all of the nodes.
    List<HtmlNodeItem> flatNodesList =
@@ -215,6 +190,7 @@ public class HtmlBuilderExample
    foreach(HtmlNodeItem nodeItem in flatNodesList)
    {
     nodeItem.Text = nodeItem.Text.Trim();
+    nodeItem.TrailingText = nodeItem.TrailingText.Trim();
    }
 
    Console.WriteLine("The document from content is:");
@@ -232,6 +208,7 @@ public class HtmlBuilderExample
 
 | Version | Description |
 |---------|-------------|
+| 25.2816.3809 | A **PreserveSpace** option has been added to the **HtmlDocument** that preserves all whitespace during parsing and rendering when set; Each **HtmlNodeItem** now has a **TrailingText** property that contains the information between the end of this node and the beginning of the next. |
 | 25.2806.4417 | An element name is now allowed to contain hyphens, underscores, and digits after the first character, which must be a letter; **HtmlNodeItem.InnerHtml** now returns the combined content of the node's **Text** and **Nodes.Html** properties. |
 | 25.2711.4233 | Any inner text following a comment block is now parsed into the object model as a blank sibling to that comment with its Text property set; an issue where the trailing text at the end of a child node was being placed on a new line has been resolved; instance-level **GetValue(string attributeName)** function has been added to the **HtmlAttributeCollection** class, to match the **GetStyle(string styleName)** function. |
 | 25.2515.4053 | A bug was fixed that had been introduced in version 25.2515.3752. The error was that no HTML nodes had closing tags. |
@@ -245,4 +222,6 @@ public class HtmlBuilderExample
 
 For more information, please see the GitHub project:
 [danielanywhere/Html](https://github.com/danielanywhere/Html)
+
+Full API documentation is available at this library's [GitHub User Page](https://danielanywhere.github.io/Html).
 

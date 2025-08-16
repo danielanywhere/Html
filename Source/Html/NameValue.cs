@@ -64,6 +64,9 @@ namespace Html.Internal
 		//*-----------------------------------------------------------------------*
 		//*	Name																																	*
 		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="Name">Name</see>.
+		/// </summary>
 		private string mName = "";
 		/// <summary>
 		/// Get/Set the name of this item.
@@ -78,6 +81,9 @@ namespace Html.Internal
 		//*-----------------------------------------------------------------------*
 		//*	Value																																	*
 		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="Value">Value</see>.
+		/// </summary>
 		private string mValue = "";
 		/// <summary>
 		/// Get/Set the value of this item.

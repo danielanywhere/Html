@@ -224,7 +224,8 @@ namespace Html
 				ro.NodeType = HtmlDocument.GetElementType(working);
 				if(ro.NodeType != "!--")
 				{
-					HtmlDocument.AssignAttributes(working, ro.Attributes);
+					HtmlDocument.AssignAttributes(working, ro.Attributes,
+						GetPreserveSpace(this));
 				}
 			}
 			if(this.ParentNode != null)
@@ -280,7 +281,8 @@ namespace Html
 				{
 					ro.Original = value;
 					ro.NodeType = HtmlDocument.GetElementType(value);
-					HtmlDocument.AssignAttributes(value, ro.Attributes);
+					HtmlDocument.AssignAttributes(value, ro.Attributes,
+						GetPreserveSpace(this));
 				}
 			}
 			if(this.ParentNode != null)
@@ -960,6 +962,37 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* GetPreserveSpace																											*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether whitespace is preserved everywhere in
+		/// the document.
+		/// </summary>
+		/// <param name="nodes">
+		/// Reference to a collection of nodes to test.
+		/// </param>
+		/// <returns>
+		/// Value indicating whether elements are separated by line on this
+		/// document.
+		/// </returns>
+		public static bool GetPreserveSpace(HtmlNodeCollection nodes)
+		{
+			HtmlDocument document = null;
+			bool result = true;
+
+			if(nodes != null)
+			{
+				document = GetDocument(nodes);
+				if(document != null)
+				{
+					result = document.PreserveSpace;
+				}
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//* GetRoot																																*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -995,36 +1028,6 @@ namespace Html
 		}
 		//*-----------------------------------------------------------------------*
 
-		////*-----------------------------------------------------------------------*
-		////* GetSelfClosing																												*
-		////*-----------------------------------------------------------------------*
-		///// <summary>
-		///// Return a value indicating whether HTML elements tend to be
-		///// self-closing on this document when no child elements are present.
-		///// </summary>
-		///// <param name="nodes">
-		///// Reference to a collection of nodes to test.
-		///// </param>
-		///// <returns>
-		///// Value indicating whether self-closing is active on this document.
-		///// </returns>
-		//public static bool GetSelfClosing(HtmlNodeCollection nodes)
-		//{
-		//	HtmlDocument document = null;
-		//	bool result = true;
-
-		//	if(nodes != null)
-		//	{
-		//		document = GetDocument(nodes);
-		//		if(document != null)
-		//		{
-		//			result = document.SelfClosing;
-		//		}
-		//	}
-		//	return result;
-		//}
-		////*-----------------------------------------------------------------------*
-
 		//*-----------------------------------------------------------------------*
 		//*	Html																																	*
 		//*-----------------------------------------------------------------------*
@@ -1035,129 +1038,34 @@ namespace Html
 		{
 			get
 			{
-				bool bFeed = false;
+				bool bFeed = GetLineFeed(this);
+				//bool bQuoted = true;
 				int index = 0;
-				StringBuilder sb = new StringBuilder();
-				bool qt = true;     //	Quoted.
+				bool lineFeedSeparation = bFeed;
+				bool preserveSpace = GetPreserveSpace(this);
+				StringBuilder builder = new StringBuilder();
 
-				foreach(HtmlNodeItem ni in this)
+				foreach(HtmlNodeItem nodeItem in this)
 				{
-					if(ni.NodeType.Length != 0 && ni.NodeType != "!--" &&
-						ni.NodeType != "?")
+					bFeed = lineFeedSeparation;
+					if(bFeed)
 					{
-						//	This is an element.
-						sb.Append("<" + ni.NodeType);
-						//	If this item has attributes, then attach them.
-						foreach(HtmlAttributeItem ai in ni.Attributes)
+						if(index + 1 < this.Count)
 						{
-							//	Each attribute has at least a name.
-							sb.Append(" " + ai.Name);
-							if(ai.Value.Length != 0 || !ai.Presence)
-							{
-								//	If the attribute has a value, then place it.
-								//	In this version, the quoted value is only omitted if
-								//	the attribute is marked as a presence-only attribute.
-								//	If deciding to unquote the following line, the unquoted
-								//	property will need to be fixed.
-								//qt = (HtmlAttributeCollection.Unquoted[ai.Name] == null);
-								qt = true;
-								sb.Append('=');
-								if(qt)
-								{
-									sb.Append('\"');
-								}
-								sb.Append(ai.Value);
-								if(qt)
-								{
-									sb.Append('\"');
-								}
-							}
-						}
-						if(ni.SelfClosing && ni.Nodes.Count == 0)
-						{
-							//	Self-closing.
-							sb.Append(" />");
-							//	On a self-closing node, the text follows the tag.
-							sb.Append(ni.Text);
-							//if(!ni.Text.EndsWith("\r") &&
-							//	!ni.Text.EndsWith("\n") &&
-							//	GetLineFeed(ni.Nodes))
-							//{
-							//	sb.AppendLine("");
-							//}
-						}
-						else
-						{
-							//	Separate closing tag.
-							sb.Append(">");
-							//	Get all of the inner stuff.
-							sb.Append(ni.Text);
-							sb.Append(ni.Nodes.Html);
-							//	If this item has a closing tag, then close it when done.
-							if(!HtmlUtil.Singles.Exists(x =>
-								x.ToLower() == ni.NodeType.ToLower()))
+							if(this[index + 1].NodeType.Length == 0 &&
+								this[index + 1].Text.Trim().Length > 0)
 							{
 								bFeed = false;
-								sb.Append("</" + ni.NodeType + ">");
-								bFeed = GetLineFeed(this);
-								if(bFeed)
-								{
-									if(index + 1 < this.Count)
-									{
-										//if(this[index + 1].NodeType.Length == 0 &&
-										//	(this[index + 1].Text.StartsWith('\r') ||
-										//	this[index + 1].Text.StartsWith('\n')))
-										if(this[index + 1].NodeType.Length == 0 &&
-											this[index + 1].Text.Trim().Length > 0)
-											{
-												bFeed = false;
-										}
-									}
-								}
-								if(bFeed && ni.NodeType == "tspan")
-								{
-									bFeed = false;
-								}
-								if(bFeed)
-								{
-									sb.AppendLine("");
-								}
-							}
-							else
-							{
-								//	Single line.
-								bFeed = GetLineFeed(this);
-								if(bFeed &&
-									ni.NodeType != "tspan" &&
-									ni.Text.IndexOfAny(new char[] { '\r', '\n' }) == -1)
-								{
-									sb.AppendLine("");
-								}
 							}
 						}
 					}
-					else if(ni.NodeType == "!--" || ni.NodeType == "?")
-					{
-						sb.Append(ni.Original);
-						if(!ni.Original.EndsWith("\r") &&
-							!ni.Original.EndsWith("\n") &&
-							GetLineFeed(ni.Nodes))
-						{
-							sb.AppendLine("");
-						}
-					}
-					else
-					{
-						//	This text occurs after the close of the inside elements, as
-						//	in the example <b>Some Stuff Inside</b>This text.
-						sb.Append(ni.Text);
-						sb.Append(ni.Nodes.Html);
-					}
+					HtmlUtil.AppendNodeHtml(nodeItem, builder, preserveSpace, bFeed);
 					index++;
 				}
-				return sb.ToString();
+				return builder.ToString();
 			}
-			set { HtmlDocument.Parse(this, value, GetIncludeComments(this)); }
+			set { HtmlDocument.Parse(this, value,
+				GetIncludeComments(this), GetPreserveSpace(this)); }
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -1251,7 +1159,8 @@ namespace Html
 					{
 						fc = ni.Parent;
 						nn = fc.Insert(ni);
-						HtmlDocument.Parse(nn.Nodes, html, GetIncludeComments(this));
+						HtmlDocument.Parse(nn.Nodes, html,
+							GetIncludeComments(this), GetPreserveSpace(this));
 						break;
 					}
 					else
@@ -1315,7 +1224,8 @@ namespace Html
 				{
 					ro.Original = html;
 					ro.NodeType = HtmlDocument.GetElementType(html);
-					HtmlDocument.AssignAttributes(html, ro.Attributes);
+					HtmlDocument.AssignAttributes(html, ro.Attributes,
+						GetPreserveSpace(this));
 				}
 			}
 			//	Refresh item index.
@@ -1354,7 +1264,8 @@ namespace Html
 					//	If we found the node, then continue.
 					fc = fn.Parent;
 					nn = fc.Insert(fn);
-					HtmlDocument.Parse(nn.Nodes, html, GetIncludeComments(this));
+					HtmlDocument.Parse(nn.Nodes, html,
+						GetIncludeComments(this), GetPreserveSpace(this));
 				}
 				else
 				{
@@ -1462,50 +1373,6 @@ namespace Html
 			}
 			return nn;
 		}
-		////*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
-		///// <summary>
-		///// Insert the provided HTML after the specified Node in the appropriate
-		///// level.
-		///// </summary>
-		///// <param name="afterID">
-		///// The Unique ID to find within the document.
-		///// </param>
-		///// <param name="html">
-		///// Html Content to Insert.
-		///// </param>
-		///// <returns>
-		///// Html Node Object constructed from caller's Html.
-		///// </returns>
-		//public HtmlNodeItem InsertAfter(string afterID, string html)
-		//{
-		//	HtmlNodeCollection fc = null; //	Found Collection.
-		//	HtmlNodeItem fn = null;       //	Found Node.
-		//	HtmlNodeItem nn = null;       //	New Node.
-
-		//	if(afterID.Length != 0 & html.Length != 0)
-		//	{
-		//		fn = this[afterID];
-		//		if(fn != null)
-		//		{
-		//			//	If we found the node, then continue.
-		//			fc = fn.Parent;
-		//			nn = fc.InsertAfter(fn);
-		//			HtmlDocument.Parse(nn, html, GetIncludeComments(this));
-		//		}
-		//		else
-		//		{
-		//			foreach(HtmlNodeItem ni in this)
-		//			{
-		//				nn = ni.Nodes.InsertAfter(afterID, html);
-		//				if(nn != null)
-		//				{
-		//					break;
-		//				}
-		//			}
-		//		}
-		//	}
-		//	return nn;
-		//}
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
@@ -1521,43 +1388,6 @@ namespace Html
 			set { mParentNode = value; }
 		}
 		//*-----------------------------------------------------------------------*
-
-		////*-----------------------------------------------------------------------*
-		////*	Remove																																*
-		////*-----------------------------------------------------------------------*
-		///// <summary>
-		///// Remove the specified Node from the Collection.
-		///// </summary>
-		///// <param name="value">
-		///// Instance of the Node to Remove.
-		///// </param>
-		//public void Remove(HtmlNodeItem value)
-		//{
-		//	//			int lc = 0;
-		//	//			int lp = 0;
-		//	//			HtmlNodeItem ni;
-
-		//	if(value != null)
-		//	{
-		//		//				lc = value.Nodes.Count;
-		//		//				while(lc != 0)
-		//		//				{
-		//		//					value.Nodes.Remove(value.Nodes[0]);
-		//		//					lc = value.Nodes.Count;
-		//		//				}
-		//		//				foreach(HtmlNodeItem ni in value.Nodes)
-		//		//				{
-		//		//					value.Nodes.Remove(ni);
-		//		//				}
-		//		try
-		//		{
-		//			this.Remove(value);
-		//			//					value.Parent = null;
-		//		}
-		//		catch { }
-		//	}
-		//}
-		////*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
 		//* RemoveAll																															*
@@ -2331,7 +2161,6 @@ namespace Html
 		public static string GetStyle(HtmlNodeItem node, string styleName)
 		{
 			HtmlAttributeItem attribute = null;
-			//string attributeValue = "";
 			string[] parts = null;
 			string result = "";
 			string[] styles = null;
@@ -2342,12 +2171,6 @@ namespace Html
 				if(attribute != null)
 				{
 					//	Style attribute found.
-					//attributeValue = attribute.Value.Trim();
-					//if(attributeValue.EndsWith(";"))
-					//{
-					//	attributeValue =
-					//		attributeValue.Substring(0, attributeValue.Length - 1);
-					//}
 					styles = attribute.Value.Split(';').Select(p => p.Trim()).ToArray();
 					foreach(string styleItem in styles)
 					{
@@ -2420,78 +2243,20 @@ namespace Html
 		{
 			get
 			{
-				StringBuilder sb = new StringBuilder();
-				bool qt = true;     //	Quoted.
+				//bool bQuoted = true;
+				StringBuilder builder = new StringBuilder();
+				bool lineFeedSeparation = true;
+				bool preserveSpace = false;
 
-				if(NodeType.Length != 0 && NodeType != "!--")
+				if(Parent != null)
 				{
-					//	This is an element.
-					sb.Append("<" + NodeType);
-					//	If this item has attributes, then attach them.
-					foreach(HtmlAttributeItem ai in Attributes)
-					{
-						//	Each attribute has at least a name.
-						sb.Append(" " + ai.Name);
-						if(ai.Value.Length != 0 || !ai.Presence)
-						{
-							//	In this version, the quoted value is used unless the
-							//	attribute is marked as presence-only.
-							//	If you decide to revert to the previous method of
-							//	using an unquoted value, you will first need to fix
-							//	the Unquoted property of the attribute collection.
-							qt = true;
-							////	If the attribute has a value, then place it.
-							//qt = (HtmlAttributeCollection.Unquoted[ai.Name] == null);
-							sb.Append('=');
-							if(qt)
-							{
-								sb.Append('\"');
-							}
-							sb.Append(ai.Value);
-							if(qt)
-							{
-								sb.Append('\"');
-							}
-						}
-					}
-					sb.Append(">");
-					//	Get all of the inner stuff.
-					if(!SelfClosing || Nodes.Count > 0)
-					{
-						sb.Append(Text);
-						sb.Append(Nodes.Html);
-					}
-					//	If this item has a closing tag, then close it when done.
-					if(!HtmlUtil.Singles.Exists(x => x.ToLower() == NodeType.ToLower()))
-					{
-						if(SelfClosing && Nodes.Count == 0)
-						{
-							sb.Append(" />");
-							//	On a self-closing node, the text follows the node.
-							sb.Append(Text);
-						}
-						else
-						{
-							sb.Append("</" + NodeType + ">");
-						}
-					}
+					lineFeedSeparation = HtmlNodeCollection.GetLineFeed(Parent);
+					preserveSpace = HtmlNodeCollection.GetPreserveSpace(Parent);
 				}
-				else if(NodeType == "!--")
-				{
-					sb.Append(mOriginal);
-					//	Uncomment this line if you want to include inner text
-					//	end caps on the end of the comment object, instead of
-					//	including them as separate blank siblings.
-					//sb.Append(Text);
-				}
-				else
-				{
-					//	This text occurs after the close of the inside elements, as
-					//	in the example <b>Some Stuff Inside</b>This text.
-					sb.Append(Text);
-					sb.Append(Nodes.Html);
-				}
-				return sb.ToString();
+				HtmlUtil.AppendNodeHtml(this, builder, preserveSpace,
+					lineFeedSeparation);
+
+				return builder.ToString();
 			}
 		}
 		//*-----------------------------------------------------------------------*
@@ -3050,6 +2815,23 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//*	TrailingText																													*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="TrailingText">TrailingText</see>.
+		/// </summary>
+		private string mTrailingText = "";
+		/// <summary>
+		/// Get/Set the text trailing the end of this node.
+		/// </summary>
+		public string TrailingText
+		{
+			get { return mTrailingText; }
+			set { mTrailingText = value; }
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//* ToString																															*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -3069,20 +2851,6 @@ namespace Html
 			return result;
 		}
 		//*-----------------------------------------------------------------------*
-
-		////*-----------------------------------------------------------------------*
-		////*	WorkingData																														*
-		////*-----------------------------------------------------------------------*
-		//private object mWorkingData = null;
-		///// <summary>
-		///// Get/Set a reference to working data used with this node.
-		///// </summary>
-		//public object WorkingData
-		//{
-		//	get { return mWorkingData; }
-		//	set { mWorkingData = value; }
-		//}
-		////*-----------------------------------------------------------------------*
 
 	}
 	//*-------------------------------------------------------------------------*

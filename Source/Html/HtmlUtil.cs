@@ -48,6 +48,177 @@ namespace Html
 		//*************************************************************************
 
 		//*-----------------------------------------------------------------------*
+		//* AppendNodeHtml																												*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Append the rendered HTML text of the provided node to the supplied
+		/// string builder.
+		/// </summary>
+		/// <param name="node">
+		/// Reference to the node to be rendered.
+		/// </param>
+		/// <param name="builder">
+		/// Reference to the string builder receiving the content.
+		/// </param>
+		/// <param name="preserveSpace">
+		/// Value indicating whether space will be preserved throughout the
+		/// document.
+		/// </param>
+		/// <param name="lineFeedSeparation">
+		/// Value indicating whether nodes are terminated with line feeds.
+		/// </param>
+		public static void AppendNodeHtml(HtmlNodeItem node,
+			StringBuilder builder,
+			bool preserveSpace, bool lineFeedSeparation)
+		{
+			bool bQuoted = true;
+
+			if(node != null && builder != null)
+			{
+				if(node.NodeType.Length > 0 && node.NodeType != "!--" &&
+					node.NodeType != "?")
+				{
+					//	This is an element.
+					builder.Append("<" + node.NodeType);
+					//	If this item has attributes, then attach them.
+					if(preserveSpace)
+					{
+						//	Preserved space output.
+						foreach(HtmlAttributeItem attributeItem in node.Attributes)
+						{
+							if(attributeItem.PreSpace.Length > 0)
+							{
+								builder.Append(attributeItem.PreSpace);
+							}
+							if(attributeItem.Name.Length > 0)
+							{
+								builder.Append(attributeItem.Name);
+							}
+							if(attributeItem.AssignmentSpace.Length > 0)
+							{
+								builder.Append(attributeItem.AssignmentSpace);
+							}
+							if(attributeItem.Name.Length > 0 &&
+								(attributeItem.Value.Length > 0 || !attributeItem.Presence))
+							{
+								//	If the attribute has a value, then place it.
+								//	In this version, the quoted value is only omitted if
+								//	the attribute is marked as a presence-only attribute.
+								//	If deciding to unquote the following line, the unquoted
+								//	property will need to be fixed.
+								//qt = (HtmlAttributeCollection.Unquoted[ai.Name] == null);
+								//	TODO: Use alternate quotes than contained in value.
+								builder.Append('\"');
+								builder.Append(attributeItem.Value);
+								builder.Append('\"');
+							}
+						}
+					}
+					else
+					{
+						//	Traditional output.
+						foreach(HtmlAttributeItem attributeItem in node.Attributes)
+						{
+							//	Each attribute has at least a name.
+							builder.Append(" " + attributeItem.Name);
+							if(attributeItem.Value.Length > 0 || !attributeItem.Presence)
+							{
+								//	If the attribute has a value, then place it.
+								//	In this version, the quoted value is only omitted if
+								//	the attribute is marked as a presence-only attribute.
+								//	If deciding to unquote the following line, the unquoted
+								//	property will need to be fixed.
+								//qt = (HtmlAttributeCollection.Unquoted[ai.Name] == null);
+								builder.Append('=');
+								if(bQuoted)
+								{
+									builder.Append('\"');
+								}
+								builder.Append(attributeItem.Value);
+								if(bQuoted)
+								{
+									builder.Append('\"');
+								}
+							}
+						}
+					}
+					if(node.SelfClosing && node.Nodes.Count == 0)
+					{
+						//	Self-closing.
+						if(!preserveSpace)
+						{
+							builder.Append(' ');
+						}
+						builder.Append("/>");
+						//	On a self-closing node, the text follows the tag.
+						builder.Append(node.Text);
+						//if(!ni.Text.EndsWith("\r") &&
+						//	!ni.Text.EndsWith("\n") &&
+						//	GetLineFeed(ni.Nodes))
+						//{
+						//	sb.AppendLine("");
+						//}
+					}
+					else
+					{
+						//	Separate closing tag.
+						builder.Append(">");
+						//	Get all of the inner stuff.
+						builder.Append(node.Text);
+						builder.Append(node.Nodes.Html);
+						//	If this item has a closing tag, then close it when done.
+						if(!HtmlUtil.Singles.Exists(x =>
+							x.ToLower() == node.NodeType.ToLower()))
+						{
+							builder.Append("</" + node.NodeType + ">");
+							if(lineFeedSeparation && node.NodeType != "tspan")
+							{
+								builder.AppendLine("");
+							}
+						}
+						else
+						{
+							//	Single item.
+							if(lineFeedSeparation &&
+								node.NodeType != "tspan" &&
+								node.Text.IndexOfAny(new char[] { '\r', '\n' }) == -1)
+							{
+								builder.AppendLine("");
+							}
+						}
+						builder.Append(node.TrailingText);
+					}
+				}
+				else if(node.NodeType == "!--" || node.NodeType == "?")
+				{
+					builder.Append(node.Original);
+					if(preserveSpace)
+					{
+						builder.Append(node.TrailingText);
+					}
+					if(lineFeedSeparation &&
+						!node.Original.EndsWith("\r") &&
+						!node.Original.EndsWith("\n"))
+					{
+						builder.AppendLine("");
+					}
+				}
+				else
+				{
+					//	(Blanks)
+					//	This text occurs after the close of the inside elements, as
+					//	in the example <b>Some Stuff Inside</b>This text.
+					//	Theoretically, this should not ever be called, after the
+					//	introduction of the TrailingText version.
+					//	TODO: Remove this section if proven to be unused.
+					builder.Append(node.Text);
+					builder.Append(node.Nodes.Html);
+				}
+			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//* Clear																																	*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -188,11 +359,16 @@ namespace Html
 		/// <param name="element">
 		/// HTML element content with opening and closing braces.
 		/// </param>
+		/// <param name="preserveSpace">
+		/// Value indicating whether to preserve all whitespace in the document.
+		/// </param>
 		/// <returns>
 		/// Collection of attribute names and values for the specified element.
 		/// </returns>
-		public static NameValueCollection GetHtmlAttributes(string element)
+		public static HtmlAttributeCollection GetHtmlAttributes(string element,
+			bool preserveSpace)
 		{
+			bool bAssignment = false;
 			bool bContinue = true;
 			StringBuilder builder = new StringBuilder();
 			char[] chars = null;
@@ -201,9 +377,16 @@ namespace Html
 			int index = 0;
 			char inEscape = char.MinValue;
 			char inQuote = char.MinValue;
-			NameValueItem item = null;
-			NameValueCollection results = new NameValueCollection();
-			int state = 0;    // 0 - Brace; 1 - Element name; 2 - Name; 3 - Value
+			HtmlAttributeItem item = null;
+			HtmlAttributeCollection results = new HtmlAttributeCollection();
+			int state = 0;
+			// State:
+			// 0 - Brace;
+			// 1 - Tag name;
+			// 2 - Pre-space;
+			// 3 - Name;
+			// 4 - Assignment space;
+			// 5 - Value
 
 			if(element?.Length > 0)
 			{
@@ -220,7 +403,7 @@ namespace Html
 							{
 								//	Brace was present.
 								Clear(builder);
-								state++;
+								state = 1;
 							}
 							else
 							{
@@ -236,7 +419,15 @@ namespace Html
 								{
 									//	Some node type was specified.
 									Clear(builder);
-									state++;
+									if(preserveSpace)
+									{
+										state = 2;
+										index--;	//	Re-read character.
+									}
+									else
+									{
+										state = 3;
+									}
 								}
 							}
 							else
@@ -245,7 +436,31 @@ namespace Html
 							}
 							break;
 						case 2:
+							//	Pre-space.
+							if(mWhiteSpace.Contains(charVal))
+							{
+								builder.Append(charVal);
+							}
+							else
+							{
+								if(builder.Length > 0)
+								{
+									//	This item will also cover spaces after the end of the
+									//	last attribute.
+									item = new HtmlAttributeItem()
+									{
+										PreSpace = builder.ToString()
+									};
+									results.Add(item);
+									Clear(builder);
+									state = 3;
+									index--;	//	Re-read the current character.
+								}
+							}
+							break;
+						case 3:
 							//	Name.
+							bAssignment = false;
 							if(mWhiteSpace.Contains(charVal) ||
 								charVal == '=' || charVal == '/' ||
 								charVal == '>' || charVal == '?')
@@ -253,22 +468,28 @@ namespace Html
 								if(builder.Length > 0)
 								{
 									//	Name was specified.
-									item = new NameValueItem()
+									if(item == null)
 									{
-										Name = builder.ToString()
-									};
-									results.Add(item);
+										item = new HtmlAttributeItem();
+										results.Add(item);
+									}
+									item.Name = builder.ToString();
 									Clear(builder);
-								}
-								if(charVal == '=')
-								{
-									//	Starting on the value.
-									state++;
 								}
 								if(charVal == '/' || charVal == '>' || charVal == '?')
 								{
 									//	End of process.
 									index = count;
+								}
+								else
+								{
+									//	Equal or whitespace.
+									//	This might be a presence-only attribute or
+									//	the assignment could be separated by spaces.
+									//	In either case, we will let the assignment
+									//	phase decide what is going to happen next.
+									state = 4;
+									index--;  //	Re-read this character.
 								}
 							}
 							else
@@ -276,7 +497,48 @@ namespace Html
 								builder.Append(charVal);
 							}
 							break;
-						case 3:
+						case 4:
+							//	Assignment.
+							if(mWhiteSpace.Contains(charVal) ||
+								charVal == '=')
+							{
+								builder.Append(charVal);
+								if(charVal == '=')
+								{
+									bAssignment = true;
+								}
+							}
+							else
+							{
+								if(item != null)
+								{
+									if(builder.Length > 0)
+									{
+										if(bAssignment)
+										{
+											if(preserveSpace)
+											{
+												item.AssignmentSpace = builder.ToString();
+											}
+											state = 5;
+										}
+										else
+										{
+											item.Presence = true;
+											item = new HtmlAttributeItem()
+											{
+												PreSpace = builder.ToString()
+											};
+											results.Add(item);
+											state = 3;
+										}
+										Clear(builder);
+										index--;	//	Re-read this character.
+									}
+								}
+							}
+							break;
+						case 5:
 							//	Value.
 							if(item != null)
 							{
@@ -315,12 +577,25 @@ namespace Html
 									{
 										item.Value = RemoveOuterQuotes(builder.ToString());
 										Clear(builder);
-										state--;
+										item = null;
 									}
 									if(charVal == '/' || charVal == '>')
 									{
 										//	End of element.
 										bContinue = false;
+									}
+									else
+									{
+										//	Whitespace.
+										if(preserveSpace)
+										{
+											state = 2;
+											index--;		//	Re-read this character.
+										}
+										else
+										{
+											state = 3;
+										}
 									}
 								}
 								else

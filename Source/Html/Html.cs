@@ -19,6 +19,7 @@
 using Html.Internal;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -108,10 +109,16 @@ namespace Html
 		/// <param name="includeComments">
 		/// Value indicating whether to include comments in the content.
 		/// </param>
-		public HtmlDocument(string html, bool includeComments = true) : this()
+		/// <param name="preserveSpace">
+		/// Value indicating whether to preserve whitespace throughout the
+		/// document.
+		/// </param>
+		public HtmlDocument(string html, bool includeComments = true,
+			bool preserveSpace = false) : this()
 		{
 			mIncludeComments = includeComments;
-			Parse(this, html, mIncludeComments);
+			mPreserveSpace = preserveSpace;
+			Parse(this, html, mIncludeComments, mPreserveSpace);
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -166,30 +173,19 @@ namespace Html
 		/// <param name="attributes">
 		/// Collection designated to receive all attribute values found.
 		/// </param>
+		/// <param name="preserveSpace">
+		/// Value indicating whether to preserve all space in the document.
+		/// </param>
 		public static void AssignAttributes(string value,
-			HtmlAttributeCollection attributes)
+			HtmlAttributeCollection attributes,
+			bool preserveSpace)
 		{
-			HtmlAttributeItem attribute = null;
-			NameValueCollection nameValues = null;
+			List<HtmlAttributeItem> nameValues = null;
 
-			//	TODO: Place attributes in a desired order of some sort.
 			if(value.Length != 0 && attributes != null)
 			{
-				nameValues = HtmlUtil.GetHtmlAttributes(value);
-				foreach(NameValueItem item in nameValues)
-				{
-					attribute = new HtmlAttributeItem()
-					{
-						Name = item.Name,
-						Value = item.Value
-					};
-					if(value.ToLower().StartsWith("<!doctype") &&
-						item.Name.ToLower() == "html")
-					{
-						attribute.Presence = true;
-					}
-					attributes.Add(attribute);
-				}
+				nameValues = HtmlUtil.GetHtmlAttributes(value, preserveSpace);
+				attributes.AddRange(nameValues);
 			}
 		}
 		//*-----------------------------------------------------------------------*
@@ -436,7 +432,7 @@ namespace Html
 		public new string Html
 		{
 			get { return Nodes.Html; }
-			set { Parse(this, value, mIncludeComments); }
+			set { Parse(this, value, mIncludeComments, mPreserveSpace); }
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -555,130 +551,50 @@ namespace Html
 		/// <param name="comments">
 		/// Value indicating whether to include comments.
 		/// </param>
+		/// <param name="preserveSpace">
+		/// Value indicating whether to preserve all space in the document.
+		/// </param>
 		/// <remarks>
 		/// This basic method does not apply most basic rules except the
 		/// expectation that the string be well-structured.
 		/// </remarks>
-		public static void Parse(HtmlDocument document, string html, bool comments)
+		public static void Parse(HtmlDocument document, string html, bool comments,
+			bool preserveSpace)
 		{
 			document.IncludeComments = comments;
-			Parse(document.Nodes, html, comments);
+			document.PreserveSpace = preserveSpace;
+			Parse(document.Nodes, html, comments, preserveSpace);
 		}
 		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
 		/// <summary>
-		/// Parse the HTML elements token list into individual nodes.
+		/// Parses the supplied HTML String to construct a basic Document.
 		/// </summary>
 		/// <param name="nodes">
-		/// Reference to the collection of nodes to which each item will be added.
+		/// Collection of nodes from which the search is starting.
 		/// </param>
-		/// <param name="tokens">
-		/// Reference to the collection of string tokens containing the valid HTML
-		/// elements.
+		/// <param name="html">
+		/// String containing HTML formatted information.
 		/// </param>
 		/// <param name="comments">
-		/// Value indicating whether to include comments in the output/
+		/// Value indicating whether comments will be included.
 		/// </param>
-		public static void Parse(HtmlNodeCollection nodes,
-			StringTokenCollection tokens, bool comments)
+		/// <param name="preserveSpace">
+		/// Value indicating whether to preserve all space in the document.
+		/// </param>
+		/// <remarks>
+		/// This basic method does not apply rules.
+		/// </remarks>
+		public static void Parse(HtmlNodeCollection nodes, string html,
+			bool comments, bool preserveSpace)
 		{
-			int count = 0;      //	List Count.
-			string element = "";
-			string eType;				//	Element Type.
-			int index = 0;
-			HtmlNodeItem node = null;	//	New Node.
-			bool selfClosing = false;	//	Singles/Self Closing.
-			string text = "";   //	Working String.
-			StringTokenItem token = null;
-			int tokenEnd = 0;
-			int tokenNextStart = 0;
+			StringTokenCollection mc;
 
-			if(nodes != null && tokens?.Count > 0)
+			nodes.ClearAll();
+			if(html?.Length != 0 && nodes != null)
 			{
-				//	If here, we have string elements and a nodes collection to start
-				//	from.
-				count = tokens.Count;
-				for(index = 0; index < count; index++)
-				{
-					token = tokens[index];
-					element = token.Value;
-					if(element.IndexOf("<break") >= 0)
-					{
-						Debug.WriteLine("Break Here", "HtmlDocument.Parse(nodes,tokens)");
-					}
-					if(element.Length > 2 && element.Substring(0, 2) == "<?")
-					{
-						//	XML opening node.
-						nodes.Add(element);
-					}
-					else if(element.Length > 3 && element.Substring(0, 3) == "<!-")
-					{
-						//	Comment.
-						if(comments)
-						{
-							node = nodes.Add(element);
-							node.Text = FormatWhitespace(element, comments);
-						}
-					}
-					else if(element.Length > 2 && element.Substring(0, 2) == "</")
-					{
-						//	End-cap for current node.
-						//	If this item begins text to the next node, then add it as
-						//	a non-node sibling to the parent node.
-						if(index + 1 < count)
-						{
-							tokenEnd = token.StartIndex + token.Length;
-							tokenNextStart = tokens[index + 1].StartIndex;
-							if(tokenNextStart > tokenEnd)
-							{
-								text = tokens.Original.Substring(tokenEnd,
-									tokenNextStart - tokenEnd);
-								if(nodes.ParentNode != null && nodes.ParentNode.Parent != null)
-								{
-									node = new HtmlNodeItem()
-									{
-										Text = text
-									};
-									nodes.ParentNode.Parent.Add(node);
-								}
-							}
-						}
-						break;
-					}
-					else
-					{
-						//	Normal-looking element.
-						eType = GetElementType(element);
-						selfClosing = false;
-						if(element.Trim().EndsWith("/>") ||
-							HtmlUtil.Singles.Exists(x => x.ToLower() == eType.ToLower()))
-						{
-							selfClosing = true;
-						}
-						node = nodes.Add(element);
-						if(element.Trim().EndsWith("/>"))
-						{
-							//	This node has a self-closing bracket.
-							node.SelfClosing = true;
-						}
-						if(count > index + 1)
-						{
-							//	Apply any additional text within this node.
-							tokenEnd = token.StartIndex + token.Length;
-							tokenNextStart = tokens[index + 1].StartIndex;
-							if(tokenNextStart > tokenEnd)
-							{
-								text = tokens.Original.Substring(tokenEnd,
-									tokenNextStart - tokenEnd);
-								node.Text = text;
-							}
-						}
-						if(!selfClosing)
-						{
-							//	The node is not self-closing. Create children.
-							index = Parse(node.Nodes, tokens, index + 1, comments);
-						}
-					}
-				}
+				//	Get the list of all closed tags.
+				mc = HtmlUtil.GetHtmlElements(html);
+				Parse(nodes, mc, 0, comments, preserveSpace);
 			}
 		}
 		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
@@ -698,11 +614,15 @@ namespace Html
 		/// <param name="comments">
 		/// Value indicating whether to include comments in the output/
 		/// </param>
+		/// <param name="preserveSpace">
+		/// Value indicating whether to preserve all space in the document.
+		/// </param>
 		/// <returns>
 		/// Index of the last captured token.
 		/// </returns>
 		public static int Parse(HtmlNodeCollection nodes,
-			StringTokenCollection tokens, int tokenIndex, bool comments)
+			StringTokenCollection tokens, int tokenIndex, bool comments,
+			bool preserveSpace)
 		{
 			int count = 0;      //	List Count.
 			string element = "";
@@ -729,7 +649,17 @@ namespace Html
 					if(element.Length > 2 && element.Substring(0, 2) == "<?")
 					{
 						//	XML opening node.
-						nodes.Add(element);
+						node = nodes.Add(element);
+						if(index + 1 < count)
+						{
+							tokenEnd = token.StartIndex + token.Length;
+							tokenNextStart = tokens[index + 1].StartIndex;
+							if(tokenNextStart > tokenEnd)
+							{
+								node.TrailingText = tokens.Original.Substring(tokenEnd,
+									tokenNextStart - tokenEnd);
+							}
+						}
 					}
 					else if(element.Length > 3 && element.Substring(0, 3) == "<!-")
 					{
@@ -762,28 +692,6 @@ namespace Html
 					}
 					else if(element.Length > 2 && element.Substring(0, 2) == "</")
 					{
-						//	End-cap for current node.
-						//	If this item begins text to the next node, then add it as
-						//	a non-node sibling to the parent node.
-						if(index + 1 < count)
-						{
-							tokenEnd = token.StartIndex + token.Length;
-							tokenNextStart = tokens[index + 1].StartIndex;
-							if(tokenNextStart > tokenEnd)
-							{
-								text = tokens.Original.Substring(tokenEnd,
-									tokenNextStart - tokenEnd);
-								if(nodes.ParentNode != null && nodes.ParentNode.Parent != null)
-								{
-									//	End cap gets its own blank sibling node.
-									node = new HtmlNodeItem()
-									{
-										Text = text
-									};
-									nodes.ParentNode.Parent.Add(node);
-								}
-							}
-						}
 						break;
 					}
 					else
@@ -817,42 +725,31 @@ namespace Html
 						if(!selfClosing)
 						{
 							//	The node is not self-closing. Create children.
-							index = Parse(node.Nodes, tokens, index + 1, comments);
+							index = Parse(node.Nodes, tokens, index + 1, comments,
+								preserveSpace);
+						}
+						//	In this version, text following the node is saved as
+						//	trailing text.
+						if(index + 1 < count)
+						{
+							token = tokens[index];
+							tokenEnd = token.StartIndex + token.Length;
+							tokenNextStart = tokens[index + 1].StartIndex;
+							if(tokenNextStart > tokenEnd)
+							{
+								node.TrailingText = tokens.Original.Substring(tokenEnd,
+									tokenNextStart - tokenEnd);
+							}
+						}
+						if(selfClosing)
+						{
+							node = null;
 						}
 						//	Otherwise, add siblings.
 					}
 				}
 			}
 			return index;
-		}
-		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
-		/// <summary>
-		/// Parses the supplied HTML String to construct a basic Document.
-		/// </summary>
-		/// <param name="nodes">
-		/// Collection of nodes from which the search is starting.
-		/// </param>
-		/// <param name="html">
-		/// String containing HTML formatted information.
-		/// </param>
-		/// <param name="comments">
-		/// Value indicating whether comments will be included.
-		/// </param>
-		/// <remarks>
-		/// This basic method does not apply rules.
-		/// </remarks>
-		public static void Parse(HtmlNodeCollection nodes, string html,
-			bool comments)
-		{
-			StringTokenCollection mc;
-
-			nodes.ClearAll();
-			if(html?.Length != 0 && nodes != null)
-			{
-				//	Get the list of all closed tags.
-				mc = HtmlUtil.GetHtmlElements(html);
-				Parse(nodes, mc, comments);
-			}
 		}
 		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
 		/// <summary>
@@ -867,15 +764,37 @@ namespace Html
 		/// <param name="comments">
 		/// Value indicating whether comments will be included.
 		/// </param>
+		/// <param name="preserveSpace">
+		/// Value indicating whether to preserve all space in the document.
+		/// </param>
 		/// <remarks>
 		/// This basic method does not apply most basic rules except the
 		/// expectation that the string be well-structured.
 		/// </remarks>
-		public static HtmlDocument Parse(string html, bool comments)
+		public static HtmlDocument Parse(string html, bool comments,
+			bool preserveSpace)
 		{
 			HtmlDocument document = new HtmlDocument();
-			Parse(document.Nodes, html, comments);
+			Parse(document.Nodes, html, comments, preserveSpace);
 			return document;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	PreserveSpace																													*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="PreserveSpace">PreserveSpace</see>.
+		/// </summary>
+		private bool mPreserveSpace = false;
+		/// <summary>
+		/// Get/Set a value indicating whether to preserve space everywhere in
+		/// the document.
+		/// </summary>
+		public bool PreserveSpace
+		{
+			get { return mPreserveSpace; }
+			set { mPreserveSpace = value; }
 		}
 		//*-----------------------------------------------------------------------*
 
