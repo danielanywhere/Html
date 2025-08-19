@@ -208,6 +208,7 @@ public class HtmlBuilderExample
 
 | Version | Description |
 |---------|-------------|
+| 25.2819.4048 | After parsing an element with an additional space at the end of the attributes in **PreserveSpace** document mode, a re-render of that elements attributes was producing a trailing no-name, empty-value attribute assignment in the form of '=""'. This condition has been corrected. |
 | 25.2819.3939 | Bubble-up event handling is now available on **HtmlNodeCollection**, **HtmlNodeItem**, **HtmlAttributeCollection**, and **HtmlNodeItem**. Please see the API documentation for more information; In **HtmlAttributeItem**, if either **PreSpace** or **AssignmentSpace** values are blank when the document is in **PreserveSpace** mode, they will now be rendered with default values. In the case of **PreSpace**, a single leading space is used and in the case of **AssignmentSpace**, an equal sign with no buffering spaces is used if **Presence == false**. |
 | 25.2816.3809 | A **PreserveSpace** option has been added to the **HtmlDocument** that preserves all whitespace during parsing and rendering when set; Each **HtmlNodeItem** now has a **TrailingText** property that contains the information between the end of this node and the beginning of the next. |
 | 25.2806.4417 | An element name is now allowed to contain hyphens, underscores, and digits after the first character, which must be a letter; **HtmlNodeItem.InnerHtml** now returns the combined content of the node's **Text** and **Nodes.Html** properties. |

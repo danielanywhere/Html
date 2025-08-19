@@ -72,6 +72,7 @@ namespace Html
 			bool preserveSpace, bool lineFeedSeparation)
 		{
 			bool bQuoted = true;
+			string nameTrim = "";
 
 			if(node != null && builder != null)
 			{
@@ -86,38 +87,39 @@ namespace Html
 						//	Preserved space output.
 						foreach(HtmlAttributeItem attributeItem in node.Attributes)
 						{
+							nameTrim = attributeItem.Name.Trim();
 							if(attributeItem.PreSpace.Length > 0)
 							{
 								builder.Append(attributeItem.PreSpace);
 							}
-							else
+							else if(nameTrim.Length > 0)
 							{
 								builder.Append(' ');
 							}
-							if(attributeItem.Name.Length > 0)
+							if(nameTrim.Length > 0)
 							{
 								builder.Append(attributeItem.Name);
-							}
-							if(attributeItem.AssignmentSpace.Length > 0)
-							{
-								builder.Append(attributeItem.AssignmentSpace);
-							}
-							else if(!attributeItem.Presence)
-							{
-								builder.Append('=');
-							}
-							if(!attributeItem.Presence)
-							{
-								//	If the attribute has a value, then place it.
-								//	In this version, the quoted value is only omitted if
-								//	the attribute is marked as a presence-only attribute.
-								//	If deciding to unquote the following line, the unquoted
-								//	property will need to be fixed.
-								//qt = (HtmlAttributeCollection.Unquoted[ai.Name] == null);
-								//	TODO: Use alternate quotes than contained in value.
-								builder.Append('\"');
-								builder.Append(attributeItem.Value);
-								builder.Append('\"');
+								if(attributeItem.AssignmentSpace.Length > 0)
+								{
+									builder.Append(attributeItem.AssignmentSpace);
+								}
+								else if(!attributeItem.Presence)
+								{
+									builder.Append('=');
+								}
+								if(!attributeItem.Presence)
+								{
+									//	If the attribute has a value, then place it.
+									//	In this version, the quoted value is only omitted if
+									//	the attribute is marked as a presence-only attribute.
+									//	If deciding to unquote the following line, the unquoted
+									//	property will need to be fixed.
+									//qt = (HtmlAttributeCollection.Unquoted[ai.Name] == null);
+									//	TODO: Use alternate quotes than contained in value.
+									builder.Append('\"');
+									builder.Append(attributeItem.Value);
+									builder.Append('\"');
+								}
 							}
 						}
 					}
