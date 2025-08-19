@@ -28,7 +28,7 @@ namespace Html
 	/// <summary>
 	/// Collection of NameItem Items.
 	/// </summary>
-	public class NameCollection : List<NameItem>
+	public class NameCollection : ChangeObjectCollection<NameItem>
 	{
 		//*************************************************************************
 		//*	Private																																*
@@ -237,7 +237,7 @@ namespace Html
 	/// <summary>
 	/// Simple Item containing a Name and optional Description.
 	/// </summary>
-	public class NameItem
+	public class NameItem : ChangeObjectItem
 	{
 		//*************************************************************************
 		//*	Private																																*
@@ -251,6 +251,9 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 		//*	Description																														*
 		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="Description">Description</see>.
+		/// </summary>
 		private string mDescription = "";
 		/// <summary>
 		/// Get/Set the Description of this Name.
@@ -258,7 +261,16 @@ namespace Html
 		public string Description
 		{
 			get { return mDescription; }
-			set { mDescription = value; }
+			set
+			{
+				string original = mDescription;
+
+				mDescription = value;
+				if(original != value)
+				{
+					OnPropertyChanged("Description", original, value);
+				}
+			}
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -272,7 +284,16 @@ namespace Html
 		public string Name
 		{
 			get { return mName; }
-			set { mName = value; }
+			set
+			{
+				string original = mName;
+
+				mName = value;
+				if(original != value)
+				{
+					OnPropertyChanged("Name", original, value);
+				}
+			}
 		}
 		//*-----------------------------------------------------------------------*
 

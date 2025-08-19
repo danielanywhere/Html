@@ -32,7 +32,7 @@ namespace Html
 	/// <summary>
 	/// Collection of HtmlNodeItem Items.
 	/// </summary>
-	public class HtmlNodeCollection : List<HtmlNodeItem>
+	public class HtmlNodeCollection : ChangeObjectCollection<HtmlNodeItem>
 	{
 		//*************************************************************************
 		//*	Private																																*
@@ -1476,14 +1476,156 @@ namespace Html
 	/// <summary>
 	/// A Single HTML Node.
 	/// </summary>
-	public class HtmlNodeItem
+	public class HtmlNodeItem : ChangeObjectItem
 	{
 		//*************************************************************************
 		//*	Private																																*
 		//*************************************************************************
+		//*-----------------------------------------------------------------------*
+		//* mAttributes_CollectionChanged																					*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// The contents of the Attributes collection have changed. This event
+		/// is sent up the chain as a change to the Attributes property.
+		/// </summary>
+		/// <param name="sender">
+		/// The object raising this event.
+		/// </param>
+		/// <param name="e">
+		/// Collection change event arguments.
+		/// </param>
+		private void mAttributes_CollectionChanged(object sender,
+			CollectionChangeEventArgs<HtmlAttributeItem> e)
+		{
+			PropertyChangeEventArgs args = new PropertyChangeEventArgs()
+			{
+				PropertyName = "Attributes"
+			};
+			OnPropertyChanged(this, args);
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* mAttributes_ItemPropertyChanged																				*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// The property of an item within the Attributes collection has changed.
+		/// </summary>
+		/// <param name="sender">
+		/// The object raising this event.
+		/// </param>
+		/// <param name="e">
+		/// Property change event arguments.
+		/// </param>
+		/// <remarks>
+		/// The local PropertyChanged event is raised and if the event isn't
+		/// handled, is bubbled up the chain.
+		/// </remarks>
+		private void mAttributes_ItemPropertyChanged(object sender,
+			PropertyChangeEventArgs e)
+		{
+			OnPropertyChanged(sender, e);
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* mComments_CollectionChanged																						*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// The content of the Comments collection have changed. This is sent up
+		/// the chain as a change to the Comments property.
+		/// </summary>
+		/// <param name="sender">
+		/// The object raising this event.
+		/// </param>
+		/// <param name="e">
+		/// Collection change event arguments.
+		/// </param>
+		private void mComments_CollectionChanged(object sender,
+			CollectionChangeEventArgs<NameItem> e)
+		{
+			PropertyChangeEventArgs args = new PropertyChangeEventArgs()
+			{
+				PropertyName = "Comments"
+			};
+			OnPropertyChanged(this, args);
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* mComments_ItemPropertyChanged																					*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// The value of an individual property on the Comments property has
+		/// changed.
+		/// </summary>
+		/// <param name="sender">
+		/// The object raising this event.
+		/// </param>
+		/// <param name="e">
+		/// Property change event arguments.
+		/// </param>
+		/// <remarks>
+		/// The local PropertyChanged event is raised and if the event isn't
+		/// handled, is bubbled up the chain.
+		/// </remarks>
+		private void mComments_ItemPropertyChanged(object sender,
+			PropertyChangeEventArgs e)
+		{
+			OnPropertyChanged(sender, e);
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* mNodes_CollectionChanged																							*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// The content of the Nodes collection have changed. This is sent up the
+		/// chain as a change to the Nodes property.
+		/// </summary>
+		/// <param name="sender">
+		/// The object raising this event.
+		/// </param>
+		/// <param name="e">
+		/// Collection change event arguments.
+		/// </param>
+		private void mNodes_CollectionChanged(object sender,
+			CollectionChangeEventArgs<HtmlNodeItem> e)
+		{
+			PropertyChangeEventArgs args = new PropertyChangeEventArgs()
+			{
+				PropertyName = "Nodes"
+			};
+			OnPropertyChanged(this, args);
+		}
+		//*-----------------------------------------------------------------------*
+
 		//*************************************************************************
 		//*	Protected																															*
 		//*************************************************************************
+		//*-----------------------------------------------------------------------*
+		//* OnPropertyChanged																											*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Run the event up the document.
+		/// </summary>
+		/// <param name="sender">
+		/// The object raising this event.
+		/// </param>
+		/// <param name="e">
+		/// Property change event arguments.
+		/// </param>
+		protected override void OnPropertyChanged(object sender,
+			PropertyChangeEventArgs e)
+		{
+			base.OnPropertyChanged(sender, e);
+			if(!e.Handled && ParentNode != null)
+			{
+				ParentNode.OnPropertyChanged(sender, e);
+			}
+		}
+		//*-----------------------------------------------------------------------*
+
 		//*************************************************************************
 		//*	Public																																*
 		//*************************************************************************
@@ -1495,7 +1637,15 @@ namespace Html
 		/// </summary>
 		public HtmlNodeItem()
 		{
+			mNodes = new HtmlNodeCollection();
 			mNodes.ParentNode = this;
+			mNodes.CollectionChanged += mNodes_CollectionChanged;
+			mAttributes = new HtmlAttributeCollection();
+			mAttributes.CollectionChanged += mAttributes_CollectionChanged;
+			mAttributes.ItemPropertyChanged += mAttributes_ItemPropertyChanged;
+			mComments = new NameCollection();
+			mComments.CollectionChanged += mComments_CollectionChanged;
+			mComments.ItemPropertyChanged += mComments_ItemPropertyChanged;
 		}
 		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
 		/// <summary>
@@ -1566,8 +1716,10 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 		//*	Attributes																														*
 		//*-----------------------------------------------------------------------*
-		private HtmlAttributeCollection mAttributes =
-			new HtmlAttributeCollection();
+		/// <summary>
+		/// Private member for <see cref="Attributes">Attributes</see>.
+		/// </summary>
+		private HtmlAttributeCollection mAttributes = null;
 		/// <summary>
 		/// Get a reference to the Collection of Attributes on this Node.
 		/// </summary>
@@ -1679,7 +1831,10 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 		//*	Comments																															*
 		//*-----------------------------------------------------------------------*
-		private NameCollection mComments = new NameCollection();
+		/// <summary>
+		/// Private member for <see cref="Comments">Comments</see>.
+		/// </summary>
+		private NameCollection mComments = null;
 		/// <summary>
 		/// Get a reference to the Comments collection for this Node.
 		/// </summary>
@@ -2264,6 +2419,9 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 		//*	Index																																	*
 		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="Index">Index</see>.
+		/// </summary>
 		private int mIndex = 0;
 		/// <summary>
 		/// Get/Set the Index of this Item within the local collection.
@@ -2271,7 +2429,16 @@ namespace Html
 		public int Index
 		{
 			get { return mIndex; }
-			set { mIndex = value; }
+			set
+			{
+				int original = mIndex;
+
+				mIndex = value;
+				if(mIndex != original)
+				{
+					OnPropertyChanged("Index", original, value);
+				}
+			}
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -2342,7 +2509,7 @@ namespace Html
 				{
 					//	This was an empty node.
 					//	Load the section without parsing.
-					this.mText = value;
+					this.Text = value;
 				}
 			}
 		}
@@ -2453,7 +2620,7 @@ namespace Html
 		/// <summary>
 		/// Internal member for <see cref="Nodes">Nodes</see>.
 		/// </summary>
-		internal HtmlNodeCollection mNodes = new HtmlNodeCollection();
+		internal HtmlNodeCollection mNodes = null;
 		/// <summary>
 		/// Get a reference to the Nodes collection for this Item.
 		/// </summary>
@@ -2466,6 +2633,9 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 		//*	NodeType																															*
 		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="NodeType">NodeType</see>.
+		/// </summary>
 		private string mNodeType = "";
 		/// <summary>
 		/// Get/Set the Node Type of this Node.
@@ -2473,7 +2643,16 @@ namespace Html
 		public string NodeType
 		{
 			get { return mNodeType; }
-			set { mNodeType = value; }
+			set
+			{
+				string original = mNodeType;
+
+				mNodeType = value;
+				if(mNodeType != original)
+				{
+					OnPropertyChanged("NodeType", original, value);
+				}
+			}
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -2527,6 +2706,9 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 		//*	Original																															*
 		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="Original">Original</see>.
+		/// </summary>
 		private string mOriginal = "";
 		/// <summary>
 		/// Get/Set the Original Value of this Node.
@@ -2534,13 +2716,25 @@ namespace Html
 		public string Original
 		{
 			get { return mOriginal; }
-			set { mOriginal = value; }
+			set
+			{
+				string original = mOriginal;
+
+				mOriginal = value;
+				if(mOriginal != original)
+				{
+					OnPropertyChanged("Original", original, value);
+				}
+			}
 		}
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
 		//*	Parent																																*
 		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="Parent">Parent</see>.
+		/// </summary>
 		private HtmlNodeCollection mParent = null;
 		/// <summary>
 		/// Get/Set the Node Collection to which this Node Belongs.
@@ -2548,7 +2742,16 @@ namespace Html
 		public HtmlNodeCollection Parent
 		{
 			get { return mParent; }
-			set { mParent = value; }
+			set
+			{
+				HtmlNodeCollection original = mParent;
+
+				mParent = value;
+				if(mParent != original)
+				{
+					OnPropertyChanged("Parent", original, value);
+				}
+			}
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -2680,7 +2883,7 @@ namespace Html
 			if(node != null)
 			{
 				HtmlNodeCollection.ResetParent(node.Nodes);
-				node.mParent = null;
+				node.Parent = null;
 			}
 		}
 		//*-----------------------------------------------------------------------*
@@ -2688,6 +2891,9 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 		//*	SelfClosing																														*
 		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="SelfClosing">SelfClosing</see>.
+		/// </summary>
 		private bool mSelfClosing = false;
 		/// <summary>
 		/// Get/Set a value indicating whether this node is self-closing.
@@ -2695,7 +2901,16 @@ namespace Html
 		public bool SelfClosing
 		{
 			get { return mSelfClosing; }
-			set { mSelfClosing = value; }
+			set
+			{
+				bool original = mSelfClosing;
+
+				mSelfClosing = value;
+				if(mSelfClosing != original)
+				{
+					OnPropertyChanged("SelfClosing", original, value);
+				}
+			}
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -2803,6 +3018,9 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 		//*	Text																																	*
 		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="Text">Text</see>.
+		/// </summary>
 		private string mText = "";
 		/// <summary>
 		/// Get/Set the Non-Elemental Text of this Node.
@@ -2810,7 +3028,16 @@ namespace Html
 		public string Text
 		{
 			get { return mText; }
-			set { mText = value; }
+			set
+			{
+				string original = mText;
+
+				mText = value;
+				if(mText != original)
+				{
+					OnPropertyChanged("Text", original, value);
+				}
+			}
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -2827,7 +3054,16 @@ namespace Html
 		public string TrailingText
 		{
 			get { return mTrailingText; }
-			set { mTrailingText = value; }
+			set
+			{
+				string original = mTrailingText;
+
+				mTrailingText = value;
+				if(mTrailingText != original)
+				{
+					OnPropertyChanged("TrailingText", original, value);
+				}
+			}
 		}
 		//*-----------------------------------------------------------------------*
 

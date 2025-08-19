@@ -90,6 +90,10 @@ namespace Html
 							{
 								builder.Append(attributeItem.PreSpace);
 							}
+							else
+							{
+								builder.Append(' ');
+							}
 							if(attributeItem.Name.Length > 0)
 							{
 								builder.Append(attributeItem.Name);
@@ -98,8 +102,11 @@ namespace Html
 							{
 								builder.Append(attributeItem.AssignmentSpace);
 							}
-							if(attributeItem.Name.Length > 0 &&
-								(attributeItem.Value.Length > 0 || !attributeItem.Presence))
+							else if(!attributeItem.Presence)
+							{
+								builder.Append('=');
+							}
+							if(!attributeItem.Presence)
 							{
 								//	If the attribute has a value, then place it.
 								//	In this version, the quoted value is only omitted if

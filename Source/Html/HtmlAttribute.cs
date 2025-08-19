@@ -30,7 +30,8 @@ namespace Html
 	/// <summary>
 	/// Collection of HtmlAttributeItem Items.
 	/// </summary>
-	public class HtmlAttributeCollection : List<HtmlAttributeItem>
+	public class HtmlAttributeCollection :
+		ChangeObjectCollection<HtmlAttributeItem>
 	{
 		//*************************************************************************
 		//*	Private																																*
@@ -634,7 +635,7 @@ namespace Html
 	/// <summary>
 	/// Definition of an Attribute Name and Value.
 	/// </summary>
-	public class HtmlAttributeItem
+	public class HtmlAttributeItem : ChangeObjectItem
 	{
 		//*************************************************************************
 		//*	Private																																*
@@ -658,7 +659,16 @@ namespace Html
 		public string AssignmentSpace
 		{
 			get { return mAssignmentSpace; }
-			set { mAssignmentSpace = value; }
+			set
+			{
+				string original = mAssignmentSpace;
+
+				mAssignmentSpace = value;
+				if(mAssignmentSpace != original)
+				{
+					OnPropertyChanged("AssignmentSpace", original, value);
+				}
+			}
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -755,6 +765,9 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 		//*	Name																																	*
 		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="Name">Name</see>.
+		/// </summary>
 		private string mName = "";
 		/// <summary>
 		/// Get/Set the Name of this Item.
@@ -762,13 +775,25 @@ namespace Html
 		public string Name
 		{
 			get { return mName; }
-			set { mName = value; }
+			set
+			{
+				string original = mName;
+
+				mName = value;
+				if(mName != original)
+				{
+					OnPropertyChanged("Name", original, value);
+				}
+			}
 		}
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
 		//*	Presence																															*
 		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="Presence">Presence</see>.
+		/// </summary>
 		private bool mPresence = false;
 		/// <summary>
 		/// Get/Set a value indicating whether this attribute is used for
@@ -777,7 +802,16 @@ namespace Html
 		public bool Presence
 		{
 			get { return mPresence; }
-			set { mPresence = value; }
+			set
+			{
+				bool original = mPresence;
+
+				mPresence = value;
+				if(mPresence != original)
+				{
+					OnPropertyChanged("Presence", original, value);
+				}
+			}
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -794,7 +828,16 @@ namespace Html
 		public string PreSpace
 		{
 			get { return mPreSpace; }
-			set { mPreSpace = value; }
+			set
+			{
+				string original = mPreSpace;
+
+				mPreSpace = value;
+				if(mPreSpace != original)
+				{
+					OnPropertyChanged("PreSpace", original, value);
+				}
+			}
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -886,6 +929,9 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 		//*	Value																																	*
 		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="Value">Value</see>.
+		/// </summary>
 		private string mValue = "";
 		/// <summary>
 		/// Get/Set the Value of this Item.
@@ -893,7 +939,16 @@ namespace Html
 		public string Value
 		{
 			get { return mValue; }
-			set { mValue = value; }
+			set
+			{
+				string original = mValue;
+
+				mValue = value;
+				if(mValue != original)
+				{
+					OnPropertyChanged("Value", original, value);
+				}
+			}
 		}
 		//*-----------------------------------------------------------------------*
 
