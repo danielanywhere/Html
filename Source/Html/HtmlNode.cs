@@ -438,6 +438,55 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* Clone																																	*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a deep copy of the provided HTML node collection.
+		/// </summary>
+		/// <param name="nodes">
+		/// Reference to the collection of nodes to copy.
+		/// </param>
+		/// <param name="uniqueIds">
+		/// Optional reference to a collection of unique IDs to be avoided.
+		/// If omitted, a list will be created from the root node.
+		/// </param>
+		/// <returns>
+		/// Reference to the newly cloned collection, if a legitimate source
+		/// was supplied. Otherwise, null.
+		/// </returns>
+		public static HtmlNodeCollection Clone(HtmlNodeCollection nodes,
+			List<string> uniqueIds = null)
+		{
+			List<string> ids = uniqueIds;
+			HtmlNodeCollection result = null;
+			HtmlNodeCollection rootCollection = null;
+
+			if(nodes != null)
+			{
+				if(ids == null)
+				{
+					rootCollection = GetRoot(nodes);
+					if(rootCollection.ParentNode != null &&
+						rootCollection.ParentNode is HtmlDocument document)
+					{
+						ids = document.UniqueIds;
+					}
+					else
+					{
+						ids = GetUniqueIds(rootCollection);
+					}
+				}
+				result = new HtmlNodeCollection();
+				foreach(HtmlNodeItem nodeItem in nodes)
+				{
+					result.Add(HtmlNodeItem.Clone(nodeItem, ids));
+				}
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//*	ContentEmpty																													*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -481,6 +530,41 @@ namespace Html
 		{
 			get { return mDocument; }
 			set { mDocument = value; }
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* FillUniqueIds																													*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Fill the provided unique IDs list from the ids found in the caller's
+		/// node collection and all of its descendants.
+		/// </summary>
+		/// <param name="nodes">
+		/// Reference to the collection of nodes to inspect.
+		/// </param>
+		/// <param name="uniqueIds">
+		/// Reference to the collection of unique IDs being populated.
+		/// </param>
+		public static void FillUniqueIds(HtmlNodeCollection nodes,
+			List<string> uniqueIds)
+		{
+			string id = "";
+			string idLower = "";
+
+			if(nodes?.Count > 0 && uniqueIds != null)
+			{
+				foreach(HtmlNodeItem nodeItem in nodes)
+				{
+					id = HtmlNodeItem.GetId(nodeItem);
+					idLower = id.ToLower();
+					if(id.Length > 0 && !uniqueIds.Exists(x => x.ToLower() == idLower))
+					{
+						uniqueIds.Add(id);
+					}
+					FillUniqueIds(nodeItem.Nodes, uniqueIds);
+				}
+			}
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -1029,6 +1113,42 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* GetUniqueIds																													*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a list of unique node ids found in the collection and its
+		/// descendants.
+		/// </summary>
+		/// <param name="nodes">
+		/// Reference to the collection of nodes to inspect.
+		/// </param>
+		/// <returns>
+		/// Reference to a list of unique ids found in the supplied structure.
+		/// </returns>
+		public static List<string> GetUniqueIds(HtmlNodeCollection nodes)
+		{
+			string id = "";
+			string idLower = "";
+			List<string> result = new List<string>();
+
+			if(nodes?.Count > 0)
+			{
+				foreach(HtmlNodeItem nodeItem in nodes)
+				{
+					id = HtmlNodeItem.GetId(nodeItem);
+					idLower = id.ToLower();
+					if(id.Length > 0 && !result.Exists(x => x.ToLower() == idLower))
+					{
+						result.Add(id);
+					}
+					FillUniqueIds(nodeItem.Nodes, result);
+				}
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//*	Html																																	*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -1482,6 +1602,38 @@ namespace Html
 		//*	Private																																*
 		//*************************************************************************
 		//*-----------------------------------------------------------------------*
+		//* FillIds																																*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Fill the ids list with ids of the specified node and all of its
+		/// descendants.
+		/// </summary>
+		/// <param name="node">
+		/// Reference to the node to inspect.
+		/// </param>
+		/// <param name="idList">
+		/// Reference to the list the ids will be placed in.
+		/// </param>
+		private static void FillIds(HtmlNodeItem node, List<string> idList)
+		{
+			string id = "";
+
+			if(node != null && idList != null)
+			{
+				id = node.Id;
+				if(id.Length > 0)
+				{
+					idList.Add(id);
+				}
+				foreach(HtmlNodeItem nodeItem in node.Nodes)
+				{
+					FillIds(nodeItem, idList);
+				}
+			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//* mAttributes_CollectionChanged																					*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -1730,6 +1882,80 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* Clone																																	*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a deep copy of the provided HTML node item.
+		/// </summary>
+		/// <param name="node">
+		/// Reference to the node to copy.
+		/// </param>
+		/// <param name="uniqueIds">
+		/// Optional reference to a list of unique IDs for the document.
+		/// If null, a list will be built from the root node.
+		/// </param>
+		/// <returns>
+		/// Reference to the newly cloned node, if a legitimate source
+		/// was supplied. Otherwise, null.
+		/// </returns>
+		public static HtmlNodeItem Clone(HtmlNodeItem node,
+			List<string> uniqueIds = null)
+		{
+			string id = "";
+			List<string> ids = uniqueIds;
+			HtmlNodeItem result = null;
+			HtmlNodeItem rootNode = null;
+
+			if(node != null)
+			{
+				if(ids == null)
+				{
+					rootNode = GetRoot(node);
+					if(rootNode is HtmlDocument document)
+					{
+						ids = document.UniqueIds;
+					}
+					else
+					{
+						ids = new List<string>();
+						id = GetId(rootNode);
+						if(id.Length > 0)
+						{
+							ids.Add(id);
+						}
+						HtmlNodeCollection.FillUniqueIds(rootNode.Nodes, ids);
+					}
+				}
+				result = new HtmlNodeItem()
+				{
+					mIndex = node.mIndex,
+					mNodeType = node.mNodeType,
+					mOriginal = node.mOriginal,
+					mSelfClosing = node.mSelfClosing,
+					mText = node.mText,
+					mTrailingText = node.mTrailingText
+				};
+				foreach(HtmlAttributeItem attributeItem in node.mAttributes)
+				{
+					result.mAttributes.Add(HtmlAttributeItem.Clone(attributeItem));
+				}
+				id = CreateUniqueId(result.mNodeType, ids);
+				result.Id = id;
+				ids.Add(id);
+				foreach(NameItem nameItem in node.mComments)
+				{
+					result.mComments.Add(NameItem.Clone(nameItem));
+				}
+				foreach(HtmlNodeItem nodeItem in node.mNodes)
+				{
+					result.mNodes.Add(HtmlNodeItem.Clone(nodeItem, ids));
+				}
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//*	ClosingTag																														*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -1880,6 +2106,59 @@ namespace Html
 					CopyContent(ni, target.Nodes.Add());
 				}
 			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* CreateUniqueId																												*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Create a unique id using the supplied base ID and list of reserved IDs.
+		/// </summary>
+		/// <param name="baseId">
+		/// The base ID to start with.
+		/// </param>
+		/// <param name="reservedIds">
+		/// Reserved IDs not allowed as a result.
+		/// </param>
+		/// <returns>
+		/// The first unique id matching the specified base ID.
+		/// </returns>
+		public static string CreateUniqueId(string baseId,
+			List<string> reservedIds)
+		{
+			List<string> ids = null;
+			int index = 1;
+			Match match = null;
+			string result = "";
+			string text = "";
+
+			if(baseId?.Length > 0 && reservedIds != null)
+			{
+				//	Remove a trailing numeric suffix.
+				match = Regex.Match(baseId, "^(?<nonNumeric>[^0-9]+)");
+				if(match.Success)
+				{
+					text = HtmlUtil.GetValue(match, "nonNumeric").ToLower();
+					ids = reservedIds.FindAll(x => x.ToLower().StartsWith(text));
+					text = $"{baseId.ToLower()}{index}";
+					if(ids.Count == 0)
+					{
+						//	No matches found. Use the base plus one.
+						result = $"{baseId}{index}";
+					}
+					else
+					{
+						while(ids.Exists(x => x.ToLower() == text))
+						{
+							index++;
+							text = $"{baseId.ToLower()}{index}";
+						}
+						result = $"{baseId}{index}";
+					}
+				}
+			}
+			return result;
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -2110,6 +2389,41 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* GetDocument																														*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a reference to the HTML document to which this item is
+		/// associated.
+		/// </summary>
+		/// <param name="node">
+		/// Reference to the node to test.
+		/// </param>
+		/// <returns>
+		/// Reference to the root document to which this item is associated.
+		/// </returns>
+		public static HtmlDocument GetDocument(HtmlNodeItem node)
+		{
+			HtmlDocument result = null;
+
+			if(node != null)
+			{
+				if(node.ParentNode != null)
+				{
+					if(node.ParentNode is HtmlDocument document)
+					{
+						result = document;
+					}
+					else
+					{
+						result = GetDocument(node.ParentNode);
+					}
+				}
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//* GetId																																	*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -2128,6 +2442,32 @@ namespace Html
 			if(node != null && node.Attributes.Exists(x => x.Name == "id"))
 			{
 				result = node.Attributes["id"].Value;
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* GetIds																																*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Retrieve a list of the ids of the specified node and all of its
+		/// descendants.
+		/// </summary>
+		/// <param name="node">
+		/// Reference to the node to inspect.
+		/// </param>
+		/// <returns>
+		/// Reference to a list of ids found on the presented node and its
+		/// descendants.
+		/// </returns>
+		public static List<string> GetIds(HtmlNodeItem node)
+		{
+			List<string> result = new List<string>();
+
+			if(node != null)
+			{
+				FillIds(node, result);
 			}
 			return result;
 		}
@@ -2345,6 +2685,42 @@ namespace Html
 							break;
 						}
 					}
+				}
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* HasAncestorNodeType																										*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether this node's parent or ancestors have
+		/// the specified tag name.
+		/// </summary>
+		/// <param name="node">
+		/// Child node at which to begin testing parents.
+		/// </param>
+		/// <param name="tagName">
+		/// Tag name to test for.
+		/// </param>
+		/// <returns>
+		/// True if the node's parent or any other ancestor have the specified
+		/// tag name.
+		/// </returns>
+		public static bool HasAncestorNodeType(HtmlNodeItem node, string tagName)
+		{
+			bool result = false;
+
+			if(node != null && node.ParentNode != null && tagName?.Length > 0)
+			{
+				if(node.ParentNode.mNodeType.ToLower() == tagName.ToLower())
+				{
+					result = true;
+				}
+				else
+				{
+					result = HasAncestorNodeType(node.ParentNode, tagName);
 				}
 			}
 			return result;

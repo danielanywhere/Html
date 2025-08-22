@@ -978,6 +978,35 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* GetValue																															*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return the value of the specified group member in the provided match.
+		/// </summary>
+		/// <param name="match">
+		/// Reference to the match to be inspected.
+		/// </param>
+		/// <param name="groupName">
+		/// Name of the group for which the value will be found.
+		/// </param>
+		/// <returns>
+		/// The value found in the specified group, if found. Otherwise, empty
+		/// string.
+		/// </returns>
+		public static string GetValue(Match match, string groupName)
+		{
+			string result = "";
+
+			if(match != null && match.Groups[groupName] != null &&
+				match.Groups[groupName].Value != null)
+			{
+				result = match.Groups[groupName].Value;
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//*	HtmlNodeTypes																													*
 		//*-----------------------------------------------------------------------*
 		/// <summary>

@@ -246,23 +246,23 @@ namespace Html
 		public event EventHandler<PropertyChangeEventArgs> ItemPropertyChanged;
 		//*-----------------------------------------------------------------------*
 
-		//*-----------------------------------------------------------------------*
-		//*	PropertyName																													*
-		//*-----------------------------------------------------------------------*
-		/// <summary>
-		/// Private member value for <see cref="PropertyName">PropertyName</see>.
-		/// </summary>
-		private string mPropertyName = "";
-		/// <summary>
-		/// Get/Set a property name to be associated with this collection for
-		/// bubble-up events.
-		/// </summary>
-		public string PropertyName
-		{
-			get { return mPropertyName; }
-			set { mPropertyName = value; }
-		}
-		//*-----------------------------------------------------------------------*
+		////*-----------------------------------------------------------------------*
+		////*	PropertyName																													*
+		////*-----------------------------------------------------------------------*
+		///// <summary>
+		///// Private member value for <see cref="PropertyName">PropertyName</see>.
+		///// </summary>
+		//private string mPropertyName = "";
+		///// <summary>
+		///// Get/Set a property name to be associated with this collection for
+		///// bubble-up events.
+		///// </summary>
+		//public string PropertyName
+		//{
+		//	get { return mPropertyName; }
+		//	set { mPropertyName = value; }
+		//}
+		////*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
 		//* Remove																																*

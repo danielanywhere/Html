@@ -265,6 +265,37 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* FillUniqueIds																													*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Fill the UniqueIds list with every ID in the document.
+		/// </summary>
+		/// <param name="document">
+		/// Reference to the document to enumerate.
+		/// </param>
+		/// <param name="refillIfFull">
+		/// Value indicating whether the process should refill the list even if it
+		/// has already been filled.
+		/// </param>
+		public static void FillUniqueIds(HtmlDocument document,
+			bool refillIfFull = false)
+		{
+			string id = "";
+
+			if(document != null && (document.mUniqueIds.Count == 0 || refillIfFull))
+			{
+				document.mUniqueIds.Clear();
+				id = GetId(document);
+				if(id.Length > 0)
+				{
+					document.mUniqueIds.Add(id);
+				}
+				HtmlNodeCollection.FillUniqueIds(document.mNodes, document.mUniqueIds);
+			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//*	GetElementType																												*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -906,6 +937,26 @@ namespace Html
 				}
 				return mSingles;
 			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	UniqueIds																															*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="UniqueIds">UniqueIds</see>.
+		/// </summary>
+		private List<string> mUniqueIds = new List<string>();
+		/// <summary>
+		/// Get a reference to the collection of unique IDs in this document.
+		/// </summary>
+		/// <remarks>
+		/// This property is not auto-generated. Call the static method
+		/// FillUniqueIds(HtmlDocument) to update the list.
+		/// </remarks>
+		public List<string> UniqueIds
+		{
+			get { return mUniqueIds; }
 		}
 		//*-----------------------------------------------------------------------*
 

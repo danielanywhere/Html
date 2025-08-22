@@ -22,6 +22,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using static Html.HtmlUtil;
+
 namespace Html
 {
 	//*-------------------------------------------------------------------------*
@@ -75,29 +77,33 @@ namespace Html
 		{
 			get
 			{
-				HtmlAttributeItem ro = null;
-				string tl = name.ToLower();
+				HtmlAttributeItem result = null;
+				string nameLower = "";
 
-				foreach(HtmlAttributeItem ai in this)
+				if(name?.Length > 0)
 				{
-					if(ai.Name.ToLower() == tl)
+					nameLower = name.ToLower();
+					foreach(HtmlAttributeItem ai in this)
 					{
-						ro = ai;
-						break;
+						if(ai.Name.ToLower() == nameLower)
+						{
+							result = ai;
+							break;
+						}
+					}
+					if(result == null)
+					{
+						result = new HtmlAttributeItem()
+						{
+							Name = name
+						};
+						if(mAutoCreate)
+						{
+							this.Add(result);
+						}
 					}
 				}
-				if(ro == null)
-				{
-					ro = new HtmlAttributeItem()
-					{
-						Name = name
-					};
-					if(mAutoCreate)
-					{
-						this.Add(ro);
-					}
-				}
-				return ro;
+				return result;
 			}
 		}
 		//*-----------------------------------------------------------------------*
@@ -246,6 +252,35 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* Clone																																	*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a deep copy of the caller's attribute collection.
+		/// </summary>
+		/// <param name="attributes">
+		/// Reference to the collection of attributes to copy.
+		/// </param>
+		/// <returns>
+		/// Reference to the newly create attributes clone, if a legitimate
+		/// value was supplied. Otherwise, null.
+		/// </returns>
+		public HtmlAttributeCollection Clone(HtmlAttributeCollection attributes)
+		{
+			HtmlAttributeCollection result = null;
+
+			if(attributes != null)
+			{
+				result = new HtmlAttributeCollection();
+				foreach(HtmlAttributeItem attributeItem in attributes)
+				{
+					result.Add(HtmlAttributeItem.Clone(attributeItem));
+				}
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//*	ContainsAny																														*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -272,6 +307,39 @@ namespace Html
 				}
 			}
 			return rv;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* GetAttributes																													*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a collection of attributes matching the specified names in
+		/// the provided node.
+		/// </summary>
+		/// <param name="node">
+		/// Reference to the HTML node in which to search for the specified
+		/// attributes.
+		/// </param>
+		/// <param name="attributeNames">
+		/// Array of attribute names to find.
+		/// </param>
+		/// <returns>
+		/// Reference to a list of attributes found in the provided node, if
+		/// found. Otherwise, an empty list.
+		/// </returns>
+		public static List<HtmlAttributeItem> GetAttributes(HtmlNodeItem node,
+			params string[] attributeNames)
+		{
+			List<HtmlAttributeItem> attribs = new List<HtmlAttributeItem>();
+
+			if(node != null && node.Attributes.Count > 0 &&
+				attributeNames?.Length > 0)
+			{
+				attribs = node.Attributes.FindAll(x =>
+					attributeNames.Contains(x.Name));
+			}
+			return attribs;
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -312,6 +380,35 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 		//* GetStyle																															*
 		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return the value of the specified style in the provided node.
+		/// </summary>
+		/// <param name="node">
+		/// Reference to the node within which to find a style attribute.
+		/// </param>
+		/// <param name="styleName">
+		/// Name of the style property to return.
+		/// </param>
+		/// <returns>
+		/// Value of the specified style property, if found. Otherwise, an
+		/// empty string.
+		/// </returns>
+		public static string GetStyle(HtmlNodeItem node, string styleName)
+		{
+			HtmlAttributeItem attribute = null;
+			string result = "";
+
+			if(node?.Attributes.Count > 0)
+			{
+				attribute = node.Attributes.FirstOrDefault(x => x.Name == "style");
+				if(attribute != null)
+				{
+					result = HtmlAttributeItem.GetStyle(attribute, styleName);
+				}
+			}
+			return result;
+		}
+		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
 		/// <summary>
 		/// Return the value of the specified style in the provided node.
 		/// </summary>
@@ -535,6 +632,70 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* RemoveStyle																														*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Remove the specified style from the style attribute within the
+		/// caller's collection.
+		/// </summary>
+		/// <param name="attributes">
+		/// Reference to the collection of attributes within which to find the
+		/// style item.
+		/// </param>
+		/// <param name="styleName">
+		/// Name of the style to remove.
+		/// </param>
+		public static void RemoveStyle(HtmlAttributeCollection attributes,
+			string styleName)
+		{
+			StringBuilder builder = new StringBuilder();
+			HtmlAttributeItem entry = null;
+			HtmlAttributeItem style = null;
+			HtmlAttributeCollection styles = null;
+
+			if(attributes?.Count > 0 && styleName?.Length > 0)
+			{
+				style = attributes.FirstOrDefault(x => x.Name.ToLower() == "style");
+				if(style != null)
+				{
+					styles = HtmlAttributeItem.GetStyles(style);
+					entry = styles.FirstOrDefault(x =>
+						x.Name.ToLower() == styleName.ToLower());
+					if(entry != null)
+					{
+						styles.Remove(entry);
+						if(styles.Count > 0)
+						{
+							//	Other styles still remain.
+							foreach(HtmlAttributeItem attributeItem in styles)
+							{
+								if(attributeItem.Name.Length > 0)
+								{
+									if(builder.Length > 0)
+									{
+										builder.Append(';');
+									}
+									builder.Append(attributeItem.Name);
+									if(attributeItem.Value.Length > 0)
+									{
+										builder.Append(':');
+										builder.Append(attributeItem.Value);
+									}
+								}
+							}
+							style.Value = builder.ToString();
+						}
+						else
+						{
+							style.Value = "";
+						}
+					}
+				}
+			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//* SetAttribute																													*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -568,25 +729,68 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* SetAttributeValue																											*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Set the value of the specified attribute from the provided node,
+		/// creating it if it didn't already exist.
+		/// </summary>
+		/// <param name="node">
+		/// Reference to the HTML node in which to search for the specified
+		/// attribute.
+		/// </param>
+		/// <param name="attributeName">
+		/// Name of the attribute to find.
+		/// </param>
+		/// <param name="attributeValue">
+		/// The value to place in the attribute.
+		/// </param>
+		public static void SetAttributeValue(HtmlNodeItem node,
+			string attributeName, string attributeValue)
+		{
+			HtmlAttributeItem attrib = null;
+
+			if(node != null && node.Attributes.Count > 0)
+			{
+				attrib = node.Attributes.FirstOrDefault(x => x.Name == attributeName);
+				if(attrib == null)
+				{
+					attrib = new HtmlAttributeItem()
+					{
+						Name = attributeName
+					};
+					node.Attributes.Add(attrib);
+				}
+				attrib.Value = attributeValue;
+			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//* SetStyle																															*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
 		/// Set the value of the specified style in the provided node.
 		/// </summary>
-		/// <param name="styleName">
-		/// Name of the style property to return.
+		/// <param name="node">
+		/// Reference to the node upon which the style will be set.
 		/// </param>
-		/// <param name="value">
+		/// <param name="styleName">
+		/// Name of the style to set.
+		/// </param>
+		/// <param name="styleValue">
 		/// Value of the style.
 		/// </param>
-		public void SetStyle(string styleName,
-			string value)
+		public static void SetStyle(HtmlNodeItem node, string styleName,
+			string styleValue)
 		{
 			HtmlAttributeItem attribute = null;
+			string value = "";
 
-			if(styleName?.Length > 0)
+			if(node != null && styleName?.Length > 0)
 			{
-				attribute = this.FirstOrDefault(x => x.Name == "style");
+				attribute = node.Attributes.FirstOrDefault(x => x.Name == "style");
+				value = (styleValue?.Length > 0 ? styleValue : "");
 				if(attribute != null)
 				{
 					//	Style attribute exists.
@@ -594,10 +798,80 @@ namespace Html
 				}
 				else
 				{
-					//	Style didn't yet exist on node.
+					//	Style wasn't present on the node.
+					node.Attributes.Add("style", $"{styleName}: {value};");
+				}
+			}
+		}
+		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
+		/// <summary>
+		/// Set the value of the specified style.
+		/// </summary>
+		/// <param name="styleName">
+		/// Name of the style to set.
+		/// </param>
+		/// <param name="styleValue">
+		/// Value of the style.
+		/// </param>
+		public void SetStyle(string styleName,
+			string styleValue)
+		{
+			HtmlAttributeItem attribute = null;
+			string value = "";
+
+			if(styleName?.Length > 0)
+			{
+				attribute = this.FirstOrDefault(x => x.Name == "style");
+				value = (styleValue?.Length > 0 ? styleValue : "");
+				if(attribute != null)
+				{
+					//	Style attribute exists.
+					HtmlAttributeItem.SetStyle(attribute, styleName, value);
+				}
+				else
+				{
+					//	Style wasn't present on the node.
 					this.Add("style", $"{styleName}: {value};");
 				}
 			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* StyleExists																														*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether the specified style exists in the
+		/// supplied attributes collection.
+		/// </summary>
+		/// <param name="attributes">
+		/// Reference to the collection of attributes to search.
+		/// </param>
+		/// <param name="styleName">
+		/// Name of the style to search for.
+		/// </param>
+		/// <returns>
+		/// True if the specified style is found within the given attributes
+		/// collection. Otherwise, false.
+		/// </returns>
+		public static bool StyleExists(HtmlAttributeCollection attributes,
+			string styleName)
+		{
+			HtmlAttributeItem attribute = null;
+			bool result = false;
+			HtmlAttributeCollection styles = null;
+
+			if(attributes?.Count > 0 && styleName?.Length > 0)
+			{
+				attribute = attributes.FirstOrDefault(x => x.Name == "style");
+				if(attribute != null)
+				{
+					styles = HtmlAttributeItem.GetStyles(attribute);
+					result =
+						styles.Exists(x => x.Name.ToLower() == styleName.ToLower());
+				}
+			}
+			return result;
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -673,6 +947,37 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* Clone																																	*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a deep copy of the specified HTML attribute.
+		/// </summary>
+		/// <param name="attribute">
+		/// Reference to the attribute to be copied.
+		/// </param>
+		/// <returns>
+		/// Reference to a new clone of the caller's attribute.
+		/// </returns>
+		public static HtmlAttributeItem Clone(HtmlAttributeItem attribute)
+		{
+			HtmlAttributeItem result = null;
+
+			if(attribute != null)
+			{
+				result = new HtmlAttributeItem()
+				{
+					mAssignmentSpace = attribute.mAssignmentSpace,
+					mName = attribute.mName,
+					mPresence = attribute.mPresence,
+					mPreSpace = attribute.mPreSpace,
+					mValue = attribute.mValue
+				};
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//* GetStyle																															*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -741,24 +1046,23 @@ namespace Html
 		/// </remarks>
 		public static HtmlAttributeCollection GetStyles(HtmlAttributeItem value)
 		{
-			HtmlAttributeCollection nc = new HtmlAttributeCollection();
-			HtmlAttributeItem ni;
-			MatchCollection mc = Regex.Matches(value.Value,
-				@"(?<n>[^:]+)(:|$)\s*(?<v>[^;]+)*(;\s*|$)");
+			HtmlAttributeCollection attributes = new HtmlAttributeCollection();
+			HtmlAttributeItem attribute;
+			MatchCollection matches = Regex.Matches(value.Value,
+				@"(?<name>[^:]+)(:|$)\s*(?<value>[^;]+)*(;\s*|$)");
+			string name = "";
 
-			foreach(Match m in mc)
+			foreach(Match matchItem in matches)
 			{
-				if(m.Groups["n"] != null)
+				name = GetValue(matchItem, "name");
+				if(name.Length > 0)
 				{
-					ni = nc.Add();
-					ni.Name = m.Groups["n"].Value;
-					if(m.Groups["v"] != null)
-					{
-						ni.Value = m.Groups["v"].Value;
-					}
+					attribute = attributes.Add();
+					attribute.Name = name;
+					attribute.Value = GetValue(matchItem, "value");
 				}
 			}
-			return nc;
+			return attributes;
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -923,6 +1227,48 @@ namespace Html
 				}
 				attribute.Value = builder.ToString();
 			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* ToString																															*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a string representation of this item.
+		/// </summary>
+		/// <returns>
+		/// String representation of this attribute.
+		/// </returns>
+		public override string ToString()
+		{
+			StringBuilder builder = new StringBuilder();
+
+			if(mName.Length > 0)
+			{
+				builder.Append(mName);
+				builder.Append(':');
+				if(mValue.Length > 0)
+				{
+					builder.Append(mValue);
+				}
+				else if(mPresence)
+				{
+					builder.Append("(presence)");
+				}
+				else
+				{
+					builder.Append("(empty)");
+				}
+			}
+			else if(mValue.Length > 0)
+			{
+				builder.Append($"(no name):{mValue}");
+			}
+			else
+			{
+				builder.Append("(blank)");
+			}
+			return builder.ToString();
 		}
 		//*-----------------------------------------------------------------------*
 

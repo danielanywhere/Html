@@ -249,6 +249,34 @@ namespace Html
 		//*	Public																																*
 		//*************************************************************************
 		//*-----------------------------------------------------------------------*
+		//* Clone																																	*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Create a deep copy of the specified item.
+		/// </summary>
+		/// <param name="item">
+		/// Reference to the item to copy.
+		/// </param>
+		/// <returns>
+		/// Reference to the new clone of the caller's item.
+		/// </returns>
+		public static NameItem Clone(NameItem item)
+		{
+			NameItem result = null;
+
+			if(item != null)
+			{
+				result = new NameItem()
+				{
+					mDescription = item.mDescription,
+					mName = item.mName
+				};
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//*	Description																														*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
