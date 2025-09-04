@@ -379,6 +379,7 @@ namespace Html
 		{
 			bool bAssignment = false;
 			bool bContinue = true;
+			bool bName = false;
 			StringBuilder builder = new StringBuilder();
 			char[] chars = null;
 			char charVal = char.MinValue;
@@ -408,6 +409,7 @@ namespace Html
 					{
 						case 0:
 							//	Bracket.
+							bName = false;
 							if(charVal == '<')
 							{
 								//	Brace was present.
@@ -422,6 +424,7 @@ namespace Html
 							break;
 						case 1:
 							//	Entry Type.
+							bName = false;
 							if(mWhiteSpace.Contains(charVal))
 							{
 								if(builder.Length > 0)
@@ -446,6 +449,7 @@ namespace Html
 							break;
 						case 2:
 							//	Pre-space.
+							bName = false;
 							if(mWhiteSpace.Contains(charVal))
 							{
 								builder.Append(charVal);
@@ -484,13 +488,14 @@ namespace Html
 									}
 									item.Name = builder.ToString();
 									Clear(builder);
+									bName = true;
 								}
 								if(charVal == '/' || charVal == '>' || charVal == '?')
 								{
 									//	End of process.
 									index = count;
 								}
-								else
+								else if(bName)
 								{
 									//	Equal or whitespace.
 									//	This might be a presence-only attribute or
@@ -503,11 +508,13 @@ namespace Html
 							}
 							else
 							{
+								//	Build the name.
 								builder.Append(charVal);
 							}
 							break;
 						case 4:
 							//	Assignment.
+							bName = false;
 							if(mWhiteSpace.Contains(charVal) ||
 								charVal == '=')
 							{
@@ -549,6 +556,7 @@ namespace Html
 							break;
 						case 5:
 							//	Value.
+							bName = false;
 							if(item != null)
 							{
 								if(inEscape != char.MinValue)

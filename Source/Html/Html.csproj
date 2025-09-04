@@ -9,7 +9,7 @@
     <Platforms>AnyCPU;x64</Platforms>
     <PackageId>Dans.Html.Library</PackageId>
     <Title>Dan's Html Library</Title>
-    <Version>25.2822.3845</Version>
+    <Version>25.2904.4408</Version>
     <Description>Dan's Html Library.</Description>
     <Copyright>Copyright(c) 2025. Daniel Patterson, MCSD (danielanywhere)</Copyright>
     <PackageProjectUrl>https://github.com/danielanywhere/Html</PackageProjectUrl>
