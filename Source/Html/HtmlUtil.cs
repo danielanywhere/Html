@@ -180,7 +180,9 @@ namespace Html
 							x.ToLower() == node.NodeType.ToLower()))
 						{
 							builder.Append("</" + node.NodeType + ">");
-							if(lineFeedSeparation && node.NodeType != "tspan")
+							if(lineFeedSeparation && node.NodeType != "tspan" &&
+								(node.TrailingText.Length == 0 ||
+								mWhiteSpace.Contains(node.TrailingText[0])))
 							{
 								builder.AppendLine("");
 							}
