@@ -332,6 +332,182 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* EstimateFontHeight																										*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return the estimated height of the font, in pixels.
+		/// </summary>
+		/// <param name="fontSize">
+		/// The size of the font, in CSS units.
+		/// </param>
+		/// <returns>
+		/// The estimated height of the font, in CSS units.
+		/// </returns>
+		public static float EstimateFontHeight(string fontSize)
+		{
+			Match match = null;
+			string measure = "";
+			string number = "";
+			float result = 0f;
+			float value = 0f;
+
+			if(fontSize?.Length > 0)
+			{
+				match = Regex.Match(fontSize, ResourceMain.rxCssNumberWithMeasure);
+				if(match.Success)
+				{
+					number = GetValue(match, "number");
+					measure = GetValue(match, "measure");
+					if(number.Length > 0)
+					{
+						value = ToFloat(number);
+						switch(measure)
+						{
+							case "ch":
+								//	Relative to the width of the zero character.
+								//	Assumed size = 10pt;
+								result = 6.666667f;
+								break;
+							case "cm":
+								//	Centimeters @ 37.795275 dpcm.
+								result = value * 37.795275f;
+								break;
+							case "em":
+							//	Relative to the stated font-size of the element,
+							//	assumed 10pt.
+							case "rem":
+								//	Relative to the font-size of the root element,
+								//	assumed 10pt.
+								result = value * 13.333333f;
+								break;
+							case "ex":
+								//	Relative to the height of the X character in the current
+								//	font.
+								result = value;
+								break;
+							case "in":
+								//	Inches @ 96 dpi.
+								result = value * 96f;
+								break;
+							case "mm":
+								//	Millimeters @ 3.779528 dpmm.
+								result = value * 3.779528f;
+								break;
+							case "pc":
+								//	Picas. 1 pica = 12 points.
+								result = value * 16f;
+								break;
+							case "pt":
+								//	Points. 1 point = 1/72 inch @ 96 dpi.
+								result = value * 1.333333f;
+								break;
+							case "px":
+							//	Pixels. Return the specific value.
+							case "":
+								//	Implied pixels. Return the specific value.
+								result = value;
+								break;
+							case "vh":
+							//	Percentage of view height, assumed to be 1080.
+							case "vmin":
+								//	Percentage of minimum view dimension. Assumed height.
+								result = (value / 100f) * 1080f;
+								break;
+							case "vmax":
+							//	Percentage of maximum view dimension. Assumed width.
+							case "vw":
+							//	Percentage of view width, assumed to be 1920.
+							case "%":
+								//	Percentage of width, assumed to be view width.
+								result = (value / 100f) * 1920f;
+								break;
+						}
+					}
+				}
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* EstimateTextHeight																										*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return the estimated text height, in pixels.
+		/// </summary>
+		/// <param name="text">
+		/// The text to measure.
+		/// </param>
+		/// <param name="fontSize">
+		/// The size of the font, with units.
+		/// </param>
+		/// <returns>
+		/// The height of the text.
+		/// </returns>
+		public static float EstimateTextHeight(string text, string fontSize)
+		{
+			float height = 0f;
+			string[] lines = null;
+
+			if(text?.Length > 0 && fontSize?.Length > 0)
+			{
+				height = EstimateFontHeight(fontSize);
+				lines = text.Split('\n');
+				height *= (lines.Length * 1.2f);
+			}
+			return height;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* EstimateTextWidth																											*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return the estimated width of the presented text for the specified
+		/// font size.
+		/// </summary>
+		/// <param name="text">
+		/// The text to estimate.
+		/// </param>
+		/// <param name="fontSize">
+		/// The size of the font, using CSS measurement units.
+		/// </param>
+		/// <returns>
+		/// The estimated width of the text, in pixels.
+		/// </returns>
+		public static float EstimateTextWidth(string text, string fontSize)
+		{
+			float height = 0f;
+			float width = 0f;
+
+			if(text?.Length > 0 && fontSize?.Length > 0)
+			{
+				height = EstimateFontHeight(fontSize);
+				foreach(char c in text)
+				{
+					if(char.IsWhiteSpace(c))
+					{
+						width += height * 0.33f;
+					}
+					else if("il.:;!|".Contains(c))
+					{
+						width += height * 0.3f;
+					}
+					else if(char.IsUpper(c))
+					{
+						width += height * 0.6f;
+					}
+					else
+					{
+						width += height * 0.5f;
+					}
+				}
+			}
+			return width;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//* FixAttributeQuotes																										*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -1106,6 +1282,49 @@ namespace Html
 		public static List<string> Singles
 		{
 			get { return mSingles; }
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* ToFloat																																*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Provide fail-safe conversion of string to numeric value.
+		/// </summary>
+		/// <param name="value">
+		/// Value to convert.
+		/// </param>
+		/// <returns>
+		/// Floating point value. 0 if not convertible.
+		/// </returns>
+		public static float ToFloat(object value)
+		{
+			float result = 0f;
+			if(value != null)
+			{
+				result = ToFloat(value.ToString());
+			}
+			return result;
+		}
+		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
+		/// <summary>
+		/// Provide fail-safe conversion of string to numeric value.
+		/// </summary>
+		/// <param name="value">
+		/// Value to convert.
+		/// </param>
+		/// <returns>
+		/// Floating point value. 0 if not convertible.
+		/// </returns>
+		public static float ToFloat(string value)
+		{
+			float result = 0f;
+			try
+			{
+				result = float.Parse(value);
+			}
+			catch { }
+			return result;
 		}
 		//*-----------------------------------------------------------------------*
 

@@ -182,4 +182,6 @@ To see working examples of various uses of this library, see the [****Source/Htm
 
 If you would like to see a bigger-picture view of the library in daily use, review some of the source of my other GitHub project [****danielanywhere/MarkdownEditor****](https://github.com/danielanywhere/MarkdownEditor). That project uses Dan's Html Library to perform almost all of the tasks that involve working directly with HTML.
 
+Full API documentation is available at this library's [**GitHub User Page**](https://danielanywhere.github.io/Html).
+
 (This ReadMe file was created in LibreOffice Write!)

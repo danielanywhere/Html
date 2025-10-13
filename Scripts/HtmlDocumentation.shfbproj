@@ -36,7 +36,7 @@
       <DocumentationSource sourceFile="..\Source\Html\bin\Release\netstandard2.1\Html.dll" />
     </DocumentationSources>
     <HelpTitle>Dan&amp;#39%3bs Html Library</HelpTitle>
-    <HelpFileVersion>25.2910.4125</HelpFileVersion>
+    <HelpFileVersion>25.3013.4544</HelpFileVersion>
     <NamingMethod>MemberName</NamingMethod>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
     <RootNamespaceContainer>False</RootNamespaceContainer>

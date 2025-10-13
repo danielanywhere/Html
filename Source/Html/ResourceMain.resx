@@ -121,6 +121,10 @@
     <value>(?i:(?s:(\&lt;!--.*?--\&gt;)|(\&lt;\!{0,1}(?&lt;tag&gt;[-_./a-z0-9]+)(\s+[-_.a-z0-9]+\s*(=\s*("[^"]*?"|'[^']*?'|[-_.a-z0-9%@#&amp;?=]+)){0,1})*?\s*/{0,1}\&gt;)))</value>
     <comment>Regular expression for extracting HTML tags.</comment>
   </data>
+  <data name="rxCssNumberWithMeasure" xml:space="preserve">
+    <value>(?&lt;number&gt;-{0,1}[0-9]+(\.[0-9]*){0,1})(?&lt;measure&gt;[a-z\%]*)</value>
+    <comment>Regular expression pattern for extracting the number and measure from a CSS value.</comment>
+  </data>
   <data name="rxHtmlAttributes" xml:space="preserve">
     <value>(?&lt;!(\&lt;|/|\!))\b(?&lt;name&gt;[a-z]+[a-z0-9-_\.\:]*)\s*(=\s*('(?&lt;value&gt;[^']*?)'|"(?&lt;value&gt;[^"]*?)"|(?&lt;value&gt;([a-zA-Z0-9#-_\(\)]+?(%|\w*?)))(\s+|&gt;))){0,1}</value>
     <comment>Regular expression for extracting attribute names and values from HTML elements.</comment>

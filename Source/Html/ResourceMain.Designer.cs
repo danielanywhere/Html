@@ -70,6 +70,15 @@ namespace Html {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to (?&lt;number&gt;-{0,1}[0-9]+(\.[0-9]*){0,1})(?&lt;measure&gt;[a-z\%]*).
+        /// </summary>
+        internal static string rxCssNumberWithMeasure {
+            get {
+                return ResourceManager.GetString("rxCssNumberWithMeasure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to (?&lt;!(\&lt;|/|\!))\b(?&lt;name&gt;[a-z]+[a-z0-9-_\.\:]*)\s*(=\s*(&apos;(?&lt;value&gt;[^&apos;]*?)&apos;|&quot;(?&lt;value&gt;[^&quot;]*?)&quot;|(?&lt;value&gt;([a-zA-Z0-9#-_\(\)]+?(%|\w*?)))(\s+|&gt;))){0,1}.
         /// </summary>
         internal static string rxHtmlAttributes {

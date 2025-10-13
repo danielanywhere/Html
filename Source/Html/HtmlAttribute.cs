@@ -38,6 +38,14 @@ namespace Html
 		//*************************************************************************
 		//*	Private																																*
 		//*************************************************************************
+		/// <summary>
+		/// Font-relative CSS measurement units.
+		/// </summary>
+		private static string[] mFontRelativeCssMeasurements = new string[]
+		{
+				"ch", "em", "ex", "rem"
+		};
+
 		//*************************************************************************
 		//*	Protected																															*
 		//*************************************************************************
@@ -311,6 +319,147 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* GetActiveStyle																												*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return the active value of the specified style in the current node or
+		/// its ancestors.
+		/// </summary>
+		/// <param name="node">
+		/// Reference to the current node to be tested.
+		/// </param>
+		/// <param name="styleName">
+		/// Name of the style to check for.
+		/// </param>
+		/// <param name="defaultValue">
+		/// The default value to return in case no active value was found.
+		/// </param>
+		/// <returns>
+		/// The active value for the specified style on the provided node or its
+		/// ancestors, if found. Otherwise, the default value, if not null.
+		/// Otherwise, an empty string.
+		/// </returns>
+		public static string GetActiveStyle(HtmlNodeItem node, string styleName,
+			string defaultValue)
+		{
+			string defaultMeasure = "";
+			float defaultNumber = 0f;
+			Match match = null;
+			string measure = "";
+			string number = "";
+			string result = "";
+			string style = "";
+
+			if(node != null && styleName?.Length > 0)
+			{
+				style = HtmlAttributeCollection.GetStyle(node, styleName);
+				if(style.Length > 0)
+				{
+					match = Regex.Match(style, ResourceMain.rxCssNumberWithMeasure);
+					if(match.Success)
+					{
+						number = HtmlUtil.GetValue(match, "number");
+						measure = HtmlUtil.GetValue(match, "measure");
+						if(measure.Length > 0)
+						{
+							if(mFontRelativeCssMeasurements.Contains(measure))
+							{
+								//	This is a font-relative measurement.
+								if(node.ParentNode != null)
+								{
+									result = GetActiveStyle(node.ParentNode, "font-size", style);
+									if(result.Length == 0 && defaultValue?.Length > 0)
+									{
+										result = defaultValue;
+									}
+									else
+									{
+										result = style;
+									}
+								}
+								else
+								{
+									result = style;
+								}
+							}
+							else
+							{
+								//	The style has been resolved locally.
+								if(defaultValue?.Length > 2 &&
+									mFontRelativeCssMeasurements.Contains(
+										measure.Substring(measure.Length - 2)) &&
+									styleName == "font-size")
+								{
+									//	Currently matching on a supplied relative font size.
+									match = Regex.Match(defaultValue,
+										ResourceMain.rxCssNumberWithMeasure);
+									if(match.Success)
+									{
+										defaultNumber =
+											ToFloat(HtmlUtil.GetValue(match, "number"));
+										defaultMeasure = HtmlUtil.GetValue(match, "measure");
+										switch(defaultMeasure)
+										{
+											case "ch":
+												defaultNumber *= 0.5f;
+												result = $"{ToFloat(number) * defaultNumber}{measure}";
+												break;
+											case "em":
+											case "ex":
+												result = $"{ToFloat(number) * defaultNumber}{measure}";
+												break;
+											case "rem":
+												if(HasAncestorStyle(node, styleName))
+												{
+													result = GetActiveStyle(node.ParentNode, "font-size",
+														defaultValue);
+												}
+												else
+												{
+													result = defaultValue;
+												}
+												break;
+										}
+									}
+								}
+								else
+								{
+									result = style;
+								}
+							}
+						}
+						else
+						{
+							result = number;
+						}
+					}
+				}
+				else if(node.ParentNode != null)
+				{
+					result = GetActiveStyle(node.ParentNode, styleName, defaultValue);
+				}
+				else if(defaultValue?.Length > 0)
+				{
+					result = defaultValue;
+				}
+				else
+				{
+					result = "";
+				}
+			}
+			else if(defaultValue?.Length > 0)
+			{
+				result = defaultValue;
+			}
+			else
+			{
+				result = "";
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//* GetAttributes																													*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -457,6 +606,40 @@ namespace Html
 			if(attrib != null)
 			{
 				result = attrib.Value;
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* HasAncestorStyle																											*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether this node's parent or one of its
+		/// ancestors contain the specified style.
+		/// </summary>
+		/// <param name="node">
+		/// Reference to the node whose ancestors will be inspected.
+		/// </param>
+		/// <param name="styleName">
+		/// The name of the style to test for.
+		/// </param>
+		/// <returns>
+		/// True if the node's parent or other ancestors contain the specified
+		/// style. Otherwise, false.
+		/// </returns>
+		public static bool HasAncestorStyle(HtmlNodeItem node, string styleName)
+		{
+			bool result = false;
+
+			if(node != null && styleName?.Length > 0 && node.ParentNode != null)
+			{
+				result = HtmlAttributeCollection.StyleExists(
+					node.ParentNode.Attributes, styleName);
+				if(!result)
+				{
+					result = HasAncestorStyle(node.ParentNode, styleName);
+				}
 			}
 			return result;
 		}
