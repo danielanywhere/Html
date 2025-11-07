@@ -481,12 +481,19 @@ namespace Html
 			params string[] attributeNames)
 		{
 			List<HtmlAttributeItem> attribs = new List<HtmlAttributeItem>();
+			HtmlAttributeItem attribute = null;
 
 			if(node != null && node.Attributes.Count > 0 &&
 				attributeNames?.Length > 0)
 			{
-				attribs = node.Attributes.FindAll(x =>
-					attributeNames.Contains(x.Name));
+				foreach(string attributeNameItem in attributeNames)
+				{
+					attribute = node.Attributes[attributeNameItem];
+					if(attribute != null)
+					{
+						attribs.Add(attribute);
+					}
+				}
 			}
 			return attribs;
 		}
@@ -512,11 +519,14 @@ namespace Html
 			string attributeName)
 		{
 			HtmlAttributeItem attrib = null;
+			string lowerName = "";
 			string result = "";
 
 			if(node != null && node.Attributes.Count > 0)
 			{
-				attrib = node.Attributes.FirstOrDefault(x => x.Name == attributeName);
+				lowerName = attributeName.ToLower();
+				attrib = node.Attributes.FirstOrDefault(x =>
+					x.Name.ToLower() == lowerName);
 				if(attrib != null)
 				{
 					result = attrib.Value;
@@ -600,12 +610,17 @@ namespace Html
 		public string GetValue(string attributeName)
 		{
 			HtmlAttributeItem attrib = null;
+			string lowerName = "";
 			string result = "";
 
-			attrib = this.FirstOrDefault(x => x.Name == attributeName);
-			if(attrib != null)
+			if(attributeName?.Length > 0)
 			{
-				result = attrib.Value;
+				lowerName = attributeName.ToLower();
+				attrib = this.FirstOrDefault(x => x.Name.ToLower() == lowerName);
+				if(attrib != null)
+				{
+					result = attrib.Value;
+				}
 			}
 			return result;
 		}
@@ -661,11 +676,13 @@ namespace Html
 		/// </returns>
 		public bool HasAttribute(string attributeName)
 		{
+			string lowerName = "";
 			bool result = false;
 
 			if(attributeName?.Length > 0)
 			{
-				result = this.Exists(x => x.Name == attributeName);
+				lowerName = attributeName.ToLower();
+				result = this.Exists(x => x.Name.ToLower() == lowerName);
 			}
 			return result;
 		}
@@ -763,22 +780,17 @@ namespace Html
 		/// <summary>
 		/// Remove the named attribute.
 		/// </summary>
-		/// <param name="name">
+		/// <param name="attributeName">
 		/// Name of the attribute to remove.
 		/// </param>
-		public void Remove(string name)
+		public void Remove(string attributeName)
 		{
-			int lc = 0;   //	List Count.
-			int lp = 0;   //	List Position.
+			string lowerName = "";
 
-			lc = this.Count;
-			for(lp = 0; lp < lc; lp++)
+			if(attributeName?.Length > 0)
 			{
-				if(this[lp].Name == name)
-				{
-					this.RemoveAt(lp);
-					break;
-				}
+				lowerName = attributeName.ToLower();
+				this.RemoveAll(x => x.Name.ToLower() == lowerName);
 			}
 		}
 		//*-----------------------------------------------------------------------*
@@ -897,7 +909,7 @@ namespace Html
 
 			if(attributeName?.Length > 0)
 			{
-				attribute = this.FirstOrDefault(x => x.Name == attributeName);
+				attribute = this[attributeName];
 				if(attribute != null)
 				{
 					attribute.Value = value;
@@ -935,7 +947,7 @@ namespace Html
 
 			if(node != null && node.Attributes.Count > 0)
 			{
-				attrib = node.Attributes.FirstOrDefault(x => x.Name == attributeName);
+				attrib = node[attributeName];
 				if(attrib == null)
 				{
 					attrib = new HtmlAttributeItem()

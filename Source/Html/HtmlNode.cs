@@ -2204,51 +2204,51 @@ namespace Html
 		public static HtmlNodeItem[] FindAttribute(HtmlNodeItem baseNode,
 			string expression, string[] attributeNames)
 		{
-			bool bf;
-			int lp = 0;
-			Match m;
-			ObjectCollection oc = new ObjectCollection();
-			HtmlNodeItem[] ro = new HtmlNodeItem[0];
-			string tl;
+			bool bFound = false;
+			int index = 0;
+			string lowerName = "";
+			Match match = null;
+			ObjectCollection objects = new ObjectCollection();
+			HtmlNodeItem[] result = new HtmlNodeItem[0];
 
 			if(baseNode != null)
 			{
 				foreach(HtmlAttributeItem ai in baseNode.Attributes)
 				{
-					tl = ai.Name;
-					bf = false;
+					lowerName = ai.Name.ToLower();
+					bFound = false;
 					foreach(string s in attributeNames)
 					{
-						if(s == tl)
+						if(s.ToLower() == lowerName)
 						{
-							bf = true;
+							bFound = true;
 							break;
 						}
 					}
-					if(bf)
+					if(bFound)
 					{
-						m = Regex.Match(ai.Value, expression);
-						if(m.Success)
+						match = Regex.Match(ai.Value, expression);
+						if(match.Success)
 						{
-							oc.Add(baseNode);
+							objects.Add(baseNode);
 							break;
 						}
 					}
 				}
 				foreach(HtmlNodeItem ni in baseNode.Nodes)
 				{
-					FindAttribute(ni, expression, attributeNames, oc);
+					FindAttribute(ni, expression, attributeNames, objects);
 				}
 			}
-			if(oc.Count != 0)
+			if(objects.Count != 0)
 			{
-				ro = new HtmlNodeItem[oc.Count];
-				foreach(HtmlNodeItem ni in oc)
+				result = new HtmlNodeItem[objects.Count];
+				foreach(HtmlNodeItem nodeItem in objects)
 				{
-					ro[lp++] = ni;
+					result[index++] = nodeItem;
 				}
 			}
-			return ro;
+			return result;
 		}
 		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
 		/// <summary>
@@ -2269,28 +2269,28 @@ namespace Html
 		public static void FindAttribute(HtmlNodeItem baseNode,
 			string expression, string[] attributeNames, ObjectCollection foundList)
 		{
-			bool bf;        //	Match Found.
-			Match m;
-			string tl;      //	Lower Case.
+			bool bFound = false;
+			string lowerName = "";
+			Match match = null;
 
 			if(baseNode != null)
 			{
 				foreach(HtmlAttributeItem ai in baseNode.Attributes)
 				{
-					tl = ai.Name;
-					bf = false;
+					lowerName = ai.Name.ToLower();
+					bFound = false;
 					foreach(string s in attributeNames)
 					{
-						if(s == tl)
+						if(s.ToLower() == lowerName)
 						{
-							bf = true;
+							bFound = true;
 							break;
 						}
 					}
-					if(bf)
+					if(bFound)
 					{
-						m = Regex.Match(ai.Value, expression);
-						if(m.Success)
+						match = Regex.Match(ai.Value, expression);
+						if(match.Success)
 						{
 							foundList.Add(baseNode);
 							break;
@@ -2439,7 +2439,7 @@ namespace Html
 		{
 			string result = "";
 
-			if(node != null && node.Attributes.Exists(x => x.Name == "id"))
+			if(node != null && node.Attributes.Exists(x => x.Name.ToLower() == "id"))
 			{
 				result = node.Attributes["id"].Value;
 			}
@@ -2913,7 +2913,7 @@ namespace Html
 			}
 			set
 			{
-				HtmlAttributeItem ai = Attributes.FirstOrDefault(x => x.Name == "id");
+				HtmlAttributeItem ai = Attributes["id"];
 
 				if(ai != null)
 				{
@@ -2973,8 +2973,7 @@ namespace Html
 			}
 			set
 			{
-				HtmlAttributeItem ai =
-					Attributes.FirstOrDefault(x => x.Name == "name");
+				HtmlAttributeItem ai = Attributes["name"];
 				if(ai != null)
 				{
 					//	If the id attribute already existed, then simply change the
@@ -3214,33 +3213,14 @@ namespace Html
 		/// <param name="node">
 		/// Instance of the Node to inspect.
 		/// </param>
-		/// <param name="name">
+		/// <param name="attributeName">
 		/// Name of the Attribute to Remove.
 		/// </param>
-		public static void RemoveAttribute(HtmlNodeItem node, string name)
+		public static void RemoveAttribute(HtmlNodeItem node, string attributeName)
 		{
-			HtmlAttributeItem ai;   //	Working Attribute.
-			int lc = 0;     //	List Count.
-			int lp = 0;     //	List Position.
-			string tl = name; //	Name to search for.
-
-			if(node != null)
+			if(node != null && attributeName?.Length > 0)
 			{
-				lc = node.Attributes.Count;
-				for(lp = 0; lp < lc; lp++)
-				{
-					ai = node.Attributes[lp];
-					if(ai.Name == tl)
-					{
-						node.Attributes.RemoveAt(lp);
-						lp--;   //	Deindex.
-						lc--;   //	Decount.
-					}
-				}
-				foreach(HtmlNodeItem ni in node.Nodes)
-				{
-					RemoveAttribute(ni, name);
-				}
+				node.mAttributes.Remove(attributeName);
 			}
 		}
 		//*-----------------------------------------------------------------------*
