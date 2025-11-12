@@ -16,12 +16,14 @@
  * 
  */
 
-using Html;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+
+using Html;
 
 namespace HtmlTests
 {
@@ -189,6 +191,30 @@ namespace HtmlTests
 		}
 		//*-----------------------------------------------------------------------*
 
+		//*-----------------------------------------------------------------------*
+		//* TestRecalculateAbsoluteIndex																					*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Test the function to recalculate the absolute index.
+		/// </summary>
+		private static void TestRecalculateAbsoluteIndex()
+		{
+			string content = "";
+			HtmlDocument document = null;
+
+			try
+			{
+				content = File.ReadAllText("TestDocument.html");
+			}
+			catch { }
+			if(content?.Length > 0)
+			{
+				document = HtmlDocument.Parse(content, true, false);
+				HtmlDocument.RecalculateAbsoluteIndex(document);
+			}
+		}
+		//*-----------------------------------------------------------------------*
+
 		//*************************************************************************
 		//*	Protected																															*
 		//*************************************************************************
@@ -259,6 +285,7 @@ namespace HtmlTests
 		/// </summary>
 		public void Run()
 		{
+			TestRecalculateAbsoluteIndex();
 			CreateHtmlDocumentFromContent();
 			CreateHtmlDocumentProgrammatically();
 			CreatePartialHtmlDocumentProgrammatically();

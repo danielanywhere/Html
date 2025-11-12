@@ -1846,22 +1846,15 @@ namespace Html
 		//*	AbsoluteIndex																													*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
+		/// Private member for <see cref="AbsoluteIndex">AbsoluteIndex</see>.
+		/// </summary>
+		private int mAbsoluteIndex = 0;
+		/// <summary>
 		/// Get the absolute index of this item in the hierarchy.
 		/// </summary>
 		public int AbsoluteIndex
 		{
-			get
-			{
-				int rv = Index;
-
-				if(ParentNode != null)
-				{
-					rv++;       //	If there is a parent, then this is at least one
-											//	further down the list from there.
-					rv += ParentNode.AbsoluteIndex;
-				}
-				return rv;
-			}
+			get { return mAbsoluteIndex; }
 		}
 		//*-----------------------------------------------------------------------*
 
@@ -3201,6 +3194,61 @@ namespace Html
 				}
 			}
 			return rs;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* RecalculateAbsoluteIndex																							*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Recalculate the AbsoluteIndex property of the node and all
+		/// of its descendants.
+		/// </summary>
+		/// <param name="node">
+		/// Reference to the node at which the recalculation will begin at 0.
+		/// </param>
+		public static void RecalculateAbsoluteIndex(HtmlNodeItem node)
+		{
+			List<HtmlNodeItem> flatList = null;
+			int index = 1;
+
+			if(node != null)
+			{
+				//	AbsoluteIndex.
+				node.mAbsoluteIndex = 0;
+				flatList = node.Nodes.FindMatches(x => x.NodeType?.Length > 0);
+				foreach(HtmlNodeItem nodeItem in flatList)
+				{
+					nodeItem.mAbsoluteIndex = index++;
+				}
+			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* RecalculateIndex																											*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Recalculate the Index property of the nodes in the immediate collection
+		/// and all of their descendants.
+		/// </summary>
+		/// <param name="nodes">
+		/// Reference to a collection of nodes for which the recalculation will
+		/// begin at 0.
+		/// </param>
+		public static void RecalculateIndex(List<HtmlNodeItem> nodes)
+		{
+			int index = 0;
+
+			if(nodes?.Count > 0)
+			{
+				//	Index.
+				foreach(HtmlNodeItem nodeItem in nodes)
+				{
+					nodeItem.mIndex = index++;
+					RecalculateIndex(nodeItem.Nodes);
+				}
+			}
 		}
 		//*-----------------------------------------------------------------------*
 
