@@ -192,6 +192,21 @@ namespace HtmlTests
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* TestHtmlAttributeCollectionSetAttribute																*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Test the HtmlAttributeCollection variations of SetAttributeX.
+		/// </summary>
+		private static void TestHtmlAttributeCollectionSetAttribute()
+		{
+			HtmlNodeItem div = new HtmlNodeItem("div");
+
+			div.Attributes.SetAttribute("x:Name", "frmMain");
+			HtmlAttributeCollection.SetAttributeValue(div, "Instance", "False");
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//* TestRecalculateAbsoluteIndex																					*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -285,6 +300,7 @@ namespace HtmlTests
 		/// </summary>
 		public void Run()
 		{
+			TestHtmlAttributeCollectionSetAttribute();
 			TestRecalculateAbsoluteIndex();
 			CreateHtmlDocumentFromContent();
 			CreateHtmlDocumentProgrammatically();

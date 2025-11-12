@@ -899,26 +899,29 @@ namespace Html
 		/// <param name="attributeName">
 		/// Name of the attribute property to return.
 		/// </param>
-		/// <param name="value">
+		/// <param name="attributeValue">
 		/// Value of the attribute.
 		/// </param>
 		public void SetAttribute(string attributeName,
-			string value)
+			string attributeValue)
 		{
 			HtmlAttributeItem attribute = null;
+			bool bAutoCreate = mAutoCreate;
+			string safeValue = "";
 
 			if(attributeName?.Length > 0)
 			{
+				if(attributeValue?.Length > 0)
+				{
+					safeValue = attributeValue;
+				}
+				mAutoCreate = true;
 				attribute = this[attributeName];
 				if(attribute != null)
 				{
-					attribute.Value = value;
+					attribute.Value = safeValue;
 				}
-				else
-				{
-					//	Attribute didn't yet exist on node.
-					this.Add(attributeName, value);
-				}
+				mAutoCreate = bAutoCreate;
 			}
 		}
 		//*-----------------------------------------------------------------------*
@@ -944,19 +947,23 @@ namespace Html
 			string attributeName, string attributeValue)
 		{
 			HtmlAttributeItem attrib = null;
+			bool bAutoCreate = false;
+			string safeValue = "";
 
 			if(node != null && node.Attributes.Count > 0)
 			{
-				attrib = node[attributeName];
-				if(attrib == null)
+				if(attributeValue?.Length > 0)
 				{
-					attrib = new HtmlAttributeItem()
-					{
-						Name = attributeName
-					};
-					node.Attributes.Add(attrib);
+					safeValue = attributeValue;
 				}
-				attrib.Value = attributeValue;
+				bAutoCreate = node.Attributes.mAutoCreate;
+				node.Attributes.mAutoCreate = true;
+				attrib = node[attributeName];
+				if(attrib != null)
+				{
+					attrib.Value = safeValue;
+				}
+				node.Attributes.mAutoCreate = bAutoCreate;
 			}
 		}
 		//*-----------------------------------------------------------------------*
