@@ -2894,31 +2894,29 @@ namespace Html
 		{
 			get
 			{
-				HtmlAttributeItem ai = Attributes["id"];
+				HtmlAttributeItem attribute = Attributes["id"];
 				string rs = "";
 
-				if(ai != null)
+				if(attribute?.Value != null)
 				{
 					//	If the ID attribute exists, then return its value.
-					rs = ai.Value;
+					rs = attribute.Value;
 				}
 				return rs;
 			}
 			set
 			{
-				HtmlAttributeItem ai = Attributes["id"];
+				HtmlAttributeItem attribute = null;
+				bool bAutoCreate = Attributes.AutoCreate;
 
-				if(ai != null)
+				Attributes.AutoCreate = true;
+				attribute = Attributes["id"];
+				if(value != null)
 				{
-					//	If the id attribute already existed, then simply change the
-					//	value.
-					ai.Value = value;
+					//	Place the value, if legitimate.
+					attribute.Value = value;
 				}
-				else
-				{
-					//	Otherwise, add it to the structure.
-					Attributes.Add("id", value);
-				}
+				Attributes.AutoCreate = bAutoCreate;
 			}
 		}
 		//*-----------------------------------------------------------------------*
@@ -2954,30 +2952,29 @@ namespace Html
 		{
 			get
 			{
-				HtmlAttributeItem ai = Attributes["name"];
-				string rs = "";
+				HtmlAttributeItem attribute = Attributes["name"];
+				string result = "";
 
-				if(ai != null)
+				if(attribute?.Value != null)
 				{
 					//	If the ID attribute exists, then return its value.
-					rs = ai.Value;
+					result = attribute.Value;
 				}
-				return rs;
+				return result;
 			}
 			set
 			{
-				HtmlAttributeItem ai = Attributes["name"];
-				if(ai != null)
+				HtmlAttributeItem attribute = null;
+				bool bAutoCreate = Attributes.AutoCreate;
+
+				Attributes.AutoCreate = true;
+				attribute = Attributes["name"];
+				if(value != null)
 				{
-					//	If the id attribute already existed, then simply change the
-					//	value.
-					ai.Value = value;
+					//	Place the value, if legitimate.
+					attribute.Value = value;
 				}
-				else
-				{
-					//	Otherwise, add it to the structure.
-					Attributes.Add("name", value);
-				}
+				Attributes.AutoCreate = bAutoCreate;
 			}
 		}
 		//*-----------------------------------------------------------------------*
