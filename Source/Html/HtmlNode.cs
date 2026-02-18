@@ -1,5 +1,5 @@
 /*
- * Copyright (c). 2000 - 2025 Daniel Patterson, MCSD (danielanywhere).
+ * Copyright (c). 2000 - 2026 Daniel Patterson, MCSD (danielanywhere).
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -144,10 +144,11 @@ namespace Html
 		public HtmlNodeItem Add(string nodeType, string text)
 		{
 			HtmlNodeItem node = null;
+			bool treatTextAsNodes = GetTreatTextAsNode(this);
 
 			if(nodeType?.Length > 0)
 			{
-				node = new HtmlNodeItem(nodeType, text);
+				node = new HtmlNodeItem(nodeType, text, treatTextAsNodes);
 			}
 			if(node == null)
 			{
@@ -325,10 +326,13 @@ namespace Html
 		/// <param name="value">
 		/// Node text to add.
 		/// </param>
+		/// <param name="treatTextAsNodes">
+		/// Value indicating whether to treat text as nodes.
+		/// </param>
 		/// <returns>
 		/// Reference to the node containing inner text.
 		/// </returns>
-		public HtmlNodeItem AddText(string value)
+		public HtmlNodeItem AddText(string value, bool treatTextAsNodes)
 		{
 			HtmlNodeItem ro = this.Add();
 			string working = "";
@@ -339,15 +343,13 @@ namespace Html
 
 			if(working.Length != 0)
 			{
-				ro.NodeType = "";
+				ro.NodeType = (treatTextAsNodes ? "text" : "");
 				ro.Text = value;
 			}
 			if(this.ParentNode != null)
 			{
 				this.ParentNode.SelfClosing = false;
 			}
-
-
 			return ro;
 		}
 		//*-----------------------------------------------------------------------*
@@ -1113,6 +1115,33 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* GetTreatTextAsNode																										*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether text on normal nodes is always
+		/// treated as separate text nodes.
+		/// </summary>
+		/// <param name="nodes">
+		/// Reference to the collection of nodes at which the search for the
+		/// setting will begin.
+		/// </param>
+		/// <returns>
+		/// True if the parent HtmlDocument has TreatTextAsNode is true. Otherwise,
+		/// false.
+		/// </returns>
+		public static bool GetTreatTextAsNode(HtmlNodeCollection nodes)
+		{
+			bool result = false;
+
+			if(nodes?.ParentNode != null)
+			{
+				result = HtmlNodeItem.GetTreatTextAsNode(nodes.ParentNode);
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//* GetUniqueIds																													*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -1162,6 +1191,8 @@ namespace Html
 				//bool bQuoted = true;
 				int index = 0;
 				bool lineFeedSeparation = bFeed;
+				HtmlNodeItem node = null;
+				string nodeType = "";
 				bool preserveSpace = GetPreserveSpace(this);
 				StringBuilder builder = new StringBuilder();
 
@@ -1172,8 +1203,10 @@ namespace Html
 					{
 						if(index + 1 < this.Count)
 						{
-							if(this[index + 1].NodeType.Length == 0 &&
-								this[index + 1].Text.Trim().Length > 0)
+							node = this[index + 1];
+							nodeType = node.NodeType;
+							if((nodeType.Length == 0 || nodeType == "text") &&
+								node.Text.Trim().Length > 0)
 							{
 								bFeed = false;
 							}
@@ -1820,12 +1853,28 @@ namespace Html
 		/// <param name="text">
 		/// Text to assign to the node.
 		/// </param>
-		public HtmlNodeItem(string nodeType, string text) : this()
+		/// <param name="treatTextAsNodes">
+		/// Value indicating whether node text will be treated as dedicated child
+		/// text nodes.
+		/// </param>
+		public HtmlNodeItem(string nodeType, string text, bool treatTextAsNodes) :
+			this()
 		{
 			mNodeType = nodeType;
 			if(text?.Length > 0)
 			{
-				mText = text;
+				if(treatTextAsNodes && nodeType != "text" && nodeType != "")
+				{
+					this.mNodes.Add(new HtmlNodeItem()
+					{
+						NodeType = "text",
+						Text = text
+					});
+				}
+				else
+				{
+					mText = text;
+				}
 			}
 		}
 		//*-----------------------------------------------------------------------*
@@ -2033,7 +2082,9 @@ namespace Html
 				}
 				ro.NodeType = value.NodeType;
 				ro.Original = value.Original;
+				ro.SelfClosing = value.SelfClosing;
 				ro.Text = value.Text;
+				ro.TrailingText = value.TrailingText;
 				//	NOTE: This was added to maintain original node Parent Collection...
 				//	In collection iteration below, the Parent Property will be
 				//	overwritten with the appropriate value.
@@ -2093,9 +2144,9 @@ namespace Html
 					target.Attributes.Add(ha.Name, ha.Value);
 				}
 				target.Text = source.Text;
+				target.TrailingText = source.TrailingText;
 				foreach(HtmlNodeItem ni in source.Nodes)
 				{
-
 					CopyContent(ni, target.Nodes.Add());
 				}
 			}
@@ -2685,6 +2736,36 @@ namespace Html
 		//*-----------------------------------------------------------------------*
 
 		//*-----------------------------------------------------------------------*
+		//* GetTreatTextAsNode																										*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return a value indicating whether text on normal nodes is always
+		/// treated as separate text nodes.
+		/// </summary>
+		/// <param name="node">
+		/// Reference to the node at which the search for the setting will begin.
+		/// </param>
+		/// <returns>
+		/// True if the parent HtmlDocument has TreatTextAsNode is true. Otherwise,
+		/// false.
+		/// </returns>
+		public static bool GetTreatTextAsNode(HtmlNodeItem node)
+		{
+			bool result = false;
+
+			if(node is HtmlDocument document)
+			{
+				result = document.TreatTextAsNodes;
+			}
+			else if(node.ParentNode != null)
+			{
+				result = GetTreatTextAsNode(node.ParentNode);
+			}
+			return result;
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
 		//* HasAncestorNodeType																										*
 		//*-----------------------------------------------------------------------*
 		/// <summary>
@@ -2854,6 +2935,7 @@ namespace Html
 			set
 			{
 				HtmlNodeItem n = null;  //	Working node.
+				bool treatTextAsNodes = GetTreatTextAsNode(this);
 
 				if(Nodes.Count > 0)
 				{
@@ -2862,7 +2944,19 @@ namespace Html
 						if(ni.Text.Length != 0)
 						{
 							n = ni;
-							ni.Text = value;
+							if(treatTextAsNodes &&
+								(ni.NodeType.Length == 0 || ni.NodeType == "text"))
+							{
+								ni.Nodes.Insert(0, new HtmlNodeItem()
+								{
+									NodeType = "text",
+									Text = value
+								});
+							}
+							else
+							{
+								ni.Text = value;
+							}
 							break;
 						}
 					}
@@ -2878,7 +2972,18 @@ namespace Html
 				{
 					//	This was an empty node.
 					//	Load the section without parsing.
-					this.Text = value;
+					if(treatTextAsNodes)
+					{
+						this.Nodes.Add(new HtmlNodeItem()
+						{
+							NodeType = "text",
+							Text = value
+						});
+					}
+					else
+					{
+						this.Text = value;
+					}
 				}
 			}
 		}
@@ -3416,6 +3521,7 @@ namespace Html
 		}
 		//*-----------------------------------------------------------------------*
 
+		//	TODO: Uncomment the Text property.
 		//*-----------------------------------------------------------------------*
 		//*	Text																																	*
 		//*-----------------------------------------------------------------------*
@@ -3442,6 +3548,7 @@ namespace Html
 		}
 		//*-----------------------------------------------------------------------*
 
+		//	TODO: Uncomment the TrailingText property.
 		//*-----------------------------------------------------------------------*
 		//*	TrailingText																													*
 		//*-----------------------------------------------------------------------*

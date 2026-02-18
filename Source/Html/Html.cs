@@ -1,5 +1,5 @@
 /*
- * Copyright (c). 2000 - 2025 Daniel Patterson, MCSD (danielanywhere).
+ * Copyright (c). 2000 - 2026 Daniel Patterson, MCSD (danielanywhere).
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -113,11 +113,16 @@ namespace Html
 		/// Value indicating whether to preserve whitespace throughout the
 		/// document.
 		/// </param>
+		/// <param name="treatTextAsNodes">
+		/// Value indicating whether text will be treated as dedicated child
+		/// text nodes.
+		/// </param>
 		public HtmlDocument(string html, bool includeComments = true,
-			bool preserveSpace = false) : this()
+			bool preserveSpace = false, bool treatTextAsNodes = false) : this()
 		{
 			mIncludeComments = includeComments;
 			mPreserveSpace = preserveSpace;
+			mTreatTextAsNodes = treatTextAsNodes;
 			Parse(this, html, mIncludeComments, mPreserveSpace);
 		}
 		//*-----------------------------------------------------------------------*
@@ -659,12 +664,14 @@ namespace Html
 			string element = "";
 			string eType;       //	Element Type.
 			int index = 0;
-			HtmlNodeItem node = null; //	New Node.
+			HtmlNodeItem node = null;
+			int nodeIndex = 0;
 			bool selfClosing = false; //	Singles/Self Closing.
 			string text = "";   //	Working String.
 			StringTokenItem token = null;
 			int tokenEnd = 0;
 			int tokenNextStart = 0;
+			bool treatTextAsNode = HtmlNodeCollection.GetTreatTextAsNode(nodes);
 
 			if(nodes != null && tokens?.Count > 0 &&
 				tokenIndex > -1 && tokenIndex < tokens.Count)
@@ -715,6 +722,7 @@ namespace Html
 								//	End cap gets its own blank sibling node.
 								node = new HtmlNodeItem()
 								{
+									NodeType = (treatTextAsNode ? "text" : ""),
 									Text = text
 								};
 								nodes.Add(node);
@@ -729,6 +737,10 @@ namespace Html
 					{
 						//	Normal-looking element.
 						eType = GetElementType(element);
+						//if(eType == "text:span")
+						//{
+						//	Debug.WriteLine("HtmlDocument.Parse: Break here...");
+						//}
 						selfClosing = false;
 						if(element.Trim().EndsWith("/>") ||
 							HtmlUtil.Singles.Exists(x => x.ToLower() == eType.ToLower()))
@@ -750,7 +762,19 @@ namespace Html
 							{
 								text = tokens.Original.Substring(tokenEnd,
 									tokenNextStart - tokenEnd);
-								node.Text = text;
+								if(treatTextAsNode)
+								{
+									node.Nodes.Add(
+										new HtmlNodeItem()
+										{
+											NodeType = "text",
+											Text = text
+										});
+								}
+								else
+								{
+									node.Text = text;
+								}
 							}
 						}
 						if(!selfClosing)
@@ -768,8 +792,21 @@ namespace Html
 							tokenNextStart = tokens[index + 1].StartIndex;
 							if(tokenNextStart > tokenEnd)
 							{
-								node.TrailingText = tokens.Original.Substring(tokenEnd,
-									tokenNextStart - tokenEnd);
+								nodeIndex = nodes.IndexOf(node);
+								if(treatTextAsNode && nodeIndex > -1)
+								{
+									nodes.Insert(nodeIndex + 1, new HtmlNodeItem()
+									{
+										NodeType = "text",
+										Text = tokens.Original.Substring(tokenEnd,
+											tokenNextStart - tokenEnd)
+									});
+								}
+								else
+								{
+									node.TrailingText = tokens.Original.Substring(tokenEnd,
+										tokenNextStart - tokenEnd);
+								}
 							}
 						}
 						if(selfClosing)
@@ -937,6 +974,24 @@ namespace Html
 				}
 				return mSingles;
 			}
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//*	TreatTextAsNodes																											*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Private member for <see cref="TreatTextAsNodes">TreatTextAsNodes</see>.
+		/// </summary>
+		private bool mTreatTextAsNodes = false;
+		/// <summary>
+		/// Get/Set a value indicating whether to treat all text in standard nodes
+		/// as separate &lt;text&gt; nodes.
+		/// </summary>
+		public bool TreatTextAsNodes
+		{
+			get { return mTreatTextAsNodes; }
+			set { mTreatTextAsNodes = value; }
 		}
 		//*-----------------------------------------------------------------------*
 

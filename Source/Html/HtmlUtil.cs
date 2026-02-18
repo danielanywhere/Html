@@ -1,5 +1,5 @@
 /*
- * Copyright (c). 2000 - 2025 Daniel Patterson, MCSD (danielanywhere).
+ * Copyright (c). 2000 - 2026 Daniel Patterson, MCSD (danielanywhere).
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ namespace Html
 			if(node != null && builder != null)
 			{
 				if(node.NodeType.Length > 0 && node.NodeType != "!--" &&
-					node.NodeType != "?")
+					node.NodeType != "?" && node.NodeType != "text")
 				{
 					//	This is an element.
 					builder.Append("<" + node.NodeType);
@@ -1144,6 +1144,7 @@ namespace Html
 						builder.Append(' ');
 					}
 					builder.Append(node.Text);
+					bEndSpace = node.Text.EndsWith(' ') || text.EndsWith('\n');
 				}
 				foreach(HtmlNodeItem nodeItem in node.Nodes)
 				{
@@ -1157,6 +1158,14 @@ namespace Html
 						builder.Append(text);
 						bEndSpace = text.EndsWith(' ') || text.EndsWith('\n');
 					}
+				}
+				if(node.TrailingText?.Length > 0)
+				{
+					if(builder.Length > 0 && !bEndSpace)
+					{
+						builder.Append(' ');
+					}
+					builder.Append(node.TrailingText);
 				}
 			}
 			return builder.ToString();

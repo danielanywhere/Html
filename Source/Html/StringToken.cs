@@ -1,5 +1,5 @@
 /*
- * Copyright (c). 2000 - 2025 Daniel Patterson, MCSD (danielanywhere).
+ * Copyright (c). 2000 - 2026 Daniel Patterson, MCSD (danielanywhere).
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -98,6 +98,23 @@ namespace Html
 		{
 			get { return mStartIndex; }
 			set { mStartIndex = value; }
+		}
+		//*-----------------------------------------------------------------------*
+
+		//*-----------------------------------------------------------------------*
+		//* ToString																															*
+		//*-----------------------------------------------------------------------*
+		/// <summary>
+		/// Return the string representation of this item.
+		/// </summary>
+		/// <returns>
+		/// The string representation of this token.
+		/// </returns>
+		public override string ToString()
+		{
+			string result = $"{mValue}:{mStartIndex}:{mValue.Length}";
+
+			return result;
 		}
 		//*-----------------------------------------------------------------------*
 

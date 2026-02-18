@@ -1,5 +1,5 @@
 /*
- * Copyright (c). 2000 - 2025 Daniel Patterson, MCSD (danielanywhere).
+ * Copyright (c). 2000 - 2026 Daniel Patterson, MCSD (danielanywhere).
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -110,7 +110,7 @@ namespace HtmlTests
 
 			//	Create the head node with a title.
 			HtmlNodeItem head = new HtmlNodeItem("head");
-			HtmlNodeItem title = new HtmlNodeItem("title", "Hello World!");
+			HtmlNodeItem title = new HtmlNodeItem("title", "Hello World!", false);
 			head.Nodes.Add(title);
 			html.Nodes.Add(head);
 
