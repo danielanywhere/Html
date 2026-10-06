@@ -125,6 +125,10 @@
     <value>(?&lt;number&gt;-{0,1}[0-9]+(\.[0-9]*){0,1})(?&lt;measure&gt;[a-z\%]*)</value>
     <comment>Regular expression pattern for extracting the number and measure from a CSS value.</comment>
   </data>
+  <data name="rxHslValue" xml:space="preserve">
+    <value>(?&lt;pattern&gt;-?\d+\.?\d*%|-?\d+\.?\d*deg|-?\d+\.?\d*rad|-?\d+\.?\d*turn|-?\d+\.?\d*|none)</value>
+    <comment>Regular expression to find HSL-formatted entries.</comment>
+  </data>
   <data name="rxHtmlAttributes" xml:space="preserve">
     <value>(?&lt;!(\&lt;|/|\!))\b(?&lt;name&gt;[a-z]+[a-z0-9-_\.\:]*)\s*(=\s*('(?&lt;value&gt;[^']*?)'|"(?&lt;value&gt;[^"]*?)"|(?&lt;value&gt;([a-zA-Z0-9#-_\(\)]+?(%|\w*?)))(\s+|&gt;))){0,1}</value>
     <comment>Regular expression for extracting attribute names and values from HTML elements.</comment>
@@ -140,5 +144,13 @@
   <data name="rxHtmlTags" xml:space="preserve">
     <value>(?i:(?s:\s*(\&lt;!--.*?--\&gt;)|(\&lt;\!{0,1}(?&lt;tag&gt;[^ \t\&gt;]+)\s*([^\&gt;]*?)\&gt;)\s*))</value>
     <comment>Regular expression for extracting HTML tags.</comment>
+  </data>
+  <data name="rxNumeric" xml:space="preserve">
+    <value>(?i:(?&lt;pattern&gt;-{0,1}[0-9]+(\.[0-9]+){0,1}(e-{0,1}[0-9]+){0,1}))</value>
+    <comment>Regular expression pattern to find the numeric pattern in the string.</comment>
+  </data>
+  <data name="rxNumericOptionalPercent" xml:space="preserve">
+    <value>(?&lt;pattern&gt;\d+(\.\d+){0,1}\%{0,1})</value>
+    <comment>Regular expression to find a numeric value with an optional percentage sign.</comment>
   </data>
 </root>

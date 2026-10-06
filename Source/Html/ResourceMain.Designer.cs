@@ -79,6 +79,15 @@ namespace Html {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to (?&lt;pattern&gt;-?\d+\.?\d*%|-?\d+\.?\d*deg|-?\d+\.?\d*rad|-?\d+\.?\d*turn|-?\d+\.?\d*|none).
+        /// </summary>
+        internal static string rxHslValue {
+            get {
+                return ResourceManager.GetString("rxHslValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to (?&lt;!(\&lt;|/|\!))\b(?&lt;name&gt;[a-z]+[a-z0-9-_\.\:]*)\s*(=\s*(&apos;(?&lt;value&gt;[^&apos;]*?)&apos;|&quot;(?&lt;value&gt;[^&quot;]*?)&quot;|(?&lt;value&gt;([a-zA-Z0-9#-_\(\)]+?(%|\w*?)))(\s+|&gt;))){0,1}.
         /// </summary>
         internal static string rxHtmlAttributes {
@@ -111,6 +120,24 @@ namespace Html {
         internal static string rxHtmlTags {
             get {
                 return ResourceManager.GetString("rxHtmlTags", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (?i:(?&lt;pattern&gt;-{0,1}[0-9]+(\.[0-9]+){0,1}(e-{0,1}[0-9]+){0,1})).
+        /// </summary>
+        internal static string rxNumeric {
+            get {
+                return ResourceManager.GetString("rxNumeric", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to (?&lt;pattern&gt;\d+(\.\d+){0,1}\%{0,1}).
+        /// </summary>
+        internal static string rxNumericOptionalPercent {
+            get {
+                return ResourceManager.GetString("rxNumericOptionalPercent", resourceCulture);
             }
         }
     }

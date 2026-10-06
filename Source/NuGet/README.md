@@ -210,6 +210,7 @@ public class HtmlBuilderExample
 
 | Version | Description |
 |---------|-------------|
+| 26.3006.2520 | **HtmlColorParser** has been added, supporting conversion to HTML hex-6 color code from RGB, HSL, Hex, and named colors. |
 | 26.2218.4544 | **TreatTextAsNodes** is now supported in the HtmlDocument and parsing activities. If set to true on Parse, all segments of text occurring between normal nodes are converted internally to the document model as &lt;text&gt; objects whose function is dedicated text. |
 | 25.3112.4353 | Corrected a condition where a new attribute was not automatically being added to the collection when calling either  **HtmlAttributeCollection.SetAttribute(attributeName, attributeValue)** or **HtmlAttributeCollection.SetAttributeValue(node, attributeName, attributeValue)** were called. |
 | 25.3112.4122 | **HtmlNodeItem.AbsoluteIndex** is no longer automatically calculated. Call **RecalculateAbsoluteIndex(HtmlNodeItem)** to set the values at your leisure; Updated **HtmlNodeItem.AbsoluteIndex** to be independent of the local **Index** property; Added **HtmlNodeItem.RecalculateAbsoluteIndex(HtmlNodeItem)** to recalculate the unique AbsoluteIndex values on every node in the document; Added **HtmlNodeItem.RecalculateIndex(List<HtmlNodeItem>)** to recalculate the Index property of the nodes in the immediate collection and all of their descendants. |

@@ -1,5 +1,5 @@
 /*
- * Copyright (c). 2000 - 2026 Daniel Patterson, MCSD (danielanywhere).
+ * Copyright (c). 2000-2026 Daniel Patterson, MCSD (danielanywhere).
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1196,6 +1196,68 @@ namespace Html
 				match.Groups[groupName].Value != null)
 			{
 				result = match.Groups[groupName].Value;
+			}
+			return result;
+		}
+		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
+		/// <summary>
+		/// Return the value of the specified group member in the provided match.
+		/// </summary>
+		/// <param name="matches">
+		/// Reference to the collection of matches to be accessed.
+		/// </param>
+		/// <param name="index">
+		/// The index of the match to inspect.
+		/// </param>
+		/// <param name="groupName">
+		/// Name of the group for which the value will be found.
+		/// </param>
+		/// <returns>
+		/// The value found in the specified group, if found. Otherwise, empty
+		/// string.
+		/// </returns>
+		public static string GetValue(MatchCollection matches, int index,
+			string groupName)
+		{
+			string result = "";
+
+			if(index > -1 && matches?.Count > index)
+			{
+				result = GetValue(matches[index], groupName);
+			}
+			return result;
+		}
+		//*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*
+		/// <summary>
+		/// Return the value of the specified group member in a match found with
+		/// the provided source and pattern.
+		/// </summary>
+		/// <param name="source">
+		/// Source string to search.
+		/// </param>
+		/// <param name="pattern">
+		/// Regular expression pattern to apply.
+		/// </param>
+		/// <param name="groupName">
+		/// Name of the group for which the value will be found.
+		/// </param>
+		/// <returns>
+		/// The value found in the specified group, if found. Otherwise, empty
+		/// string.
+		/// </returns>
+		public static string GetValue(string source, string pattern,
+			string groupName)
+		{
+			Match match = null;
+			string result = "";
+
+			if(source?.Length > 0 && pattern?.Length > 0 && groupName?.Length > 0)
+			{
+				match = Regex.Match(source, pattern);
+				if(match.Success)
+				{
+					result = GetValue(match, groupName);
+				}
 			}
 			return result;
 		}
